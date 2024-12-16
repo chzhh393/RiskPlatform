@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Switch } from 'antd';
 import mermaid from 'mermaid';
 import { mockTopologyData } from '../mock/data';
@@ -33,7 +33,7 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ linkId }) => {
   }, []);
 
   // 过滤指标数据
-  const formatMetrics = (metricsStr: string) => {
+  const formatMetrics = useCallback((metricsStr: string) => {
     if (!metricsStr) return '';
 
     const lines = metricsStr.split('<br/>');
@@ -54,10 +54,10 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ linkId }) => {
     });
 
     return filteredLines.join('<br/>');
-  };
+  }, [showAllMetrics]);
 
   // 处理节点文本
-  const processNodeText = (text: string) => {
+  const processNodeText = useCallback((text: string) => {
     // 首先分离节点名称和其他内容
     const [nodeName, ...rest] = text.split('<br/>');
     if (rest.length === 0) return text;
@@ -89,10 +89,10 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ linkId }) => {
 
     // 重组完整的节点文本
     return `${nodeName}<br/>${pathSpan}<br/><span style='font-size:10px;color:#666'>${processedMetrics}</span>`;
-  };
+  }, [showAllMetrics, formatMetrics]);
 
   // 处理 mermaid 代码
-  const processMermaidCode = (code: string) => {
+  const processMermaidCode = useCallback((code: string) => {
     return code
       .split('\n')
       .map(line => {
@@ -104,7 +104,7 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ linkId }) => {
         });
       })
       .join('\n');
-  };
+  }, [processNodeText]);
 
   useEffect(() => {
     if (!containerRef.current || !linkId) return;
@@ -135,7 +135,7 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ linkId }) => {
     };
 
     renderDiagram();
-  }, [linkId, showAllMetrics]);
+  }, [linkId, showAllMetrics, processMermaidCode]);
 
   return (
     <div className="topology-container">
