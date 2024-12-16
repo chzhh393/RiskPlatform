@@ -271,3 +271,5 @@ export const mockTopologyData = {
 
     classDef entry fill:#e6f7ff,stroke:#1890ff,rx:4,ry:4`
 }; 
+
+console.log('Current mock/data.ts content:');

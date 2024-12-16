@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Layout } from 'antd';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import BusinessTree from './components/BusinessTree';
+import BusinessTree, { BusinessTreeProps } from './components/BusinessTree';
 import TopologyGraph from './components/TopologyGraph';
 import { mockBusinessData } from './services/api';
 import './styles.less';
@@ -12,7 +12,7 @@ const LinkTopologyPage: React.FC = () => {
   const [selectedLinkId, setSelectedLinkId] = useState<string | undefined>(undefined);
   const [collapsed, setCollapsed] = useState(false);
 
-  const handleSelect = (key: string) => {
+  const handleSelect: BusinessTreeProps['onSelect'] = (key) => {
     setSelectedLinkId(key);
   };
 
