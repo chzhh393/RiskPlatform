@@ -89,7 +89,7 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ linkId }) => {
 
     // 重组完整的节点文本
     return `${nodeName}<br/>${pathSpan}<br/><span style='font-size:10px;color:#666'>${processedMetrics}</span>`;
-  }, [showAllMetrics, formatMetrics]);
+  }, [formatMetrics]);
 
   // 处理 mermaid 代码
   const processMermaidCode = useCallback((code: string) => {
@@ -135,7 +135,7 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ linkId }) => {
     };
 
     renderDiagram();
-  }, [linkId, showAllMetrics, processMermaidCode]);
+  }, [linkId, processMermaidCode]);
 
   return (
     <div className="topology-container">
