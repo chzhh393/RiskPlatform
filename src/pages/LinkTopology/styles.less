@@ -1,0 +1,371 @@
+.link-topology-page {
+  height: 100vh;
+  
+  .left-sider {
+    background: #fff;
+    border-right: 1px solid #f0f0f0;
+    padding: 16px;
+    position: relative;
+    transition: all 0.2s;
+    
+    .business-tree-container {
+      .tree-title {
+        margin-bottom: 16px;
+        padding-left: 8px;
+        font-size: 16px;
+        font-weight: 500;
+      }
+      
+      .tree-node-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        
+        .level-tag {
+          font-size: 12px;
+          padding: 2px 6px;
+          border-radius: 10px;
+          
+          &.core {
+            background: #e6f7ff;
+            color: #1890ff;
+          }
+          
+          &.non-core {
+            background: #f5f5f5;
+            color: #666;
+          }
+        }
+      }
+    }
+
+    .sider-trigger {
+      position: absolute;
+      top: 50%;
+      right: -16px;
+      width: 16px;
+      height: 40px;
+      background: #fff;
+      border: 1px solid #f0f0f0;
+      border-left: none;
+      border-radius: 0 4px 4px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1;
+      transition: all 0.2s;
+
+      &:hover {
+        color: #1890ff;
+        background: #e6f7ff;
+      }
+
+      .anticon {
+        font-size: 12px;
+      }
+    }
+
+    &.ant-layout-sider-collapsed {
+      padding: 16px 0;
+      width: 0 !important;
+      min-width: 0 !important;
+
+      .business-tree-container {
+        display: none;
+      }
+    }
+  }
+  
+  .right-content {
+    padding: 24px;
+    background: #fff;
+    
+    .topology-graph {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      
+      .empty-tip {
+        color: #999;
+        font-size: 14px;
+      }
+      
+      .error-tip {
+        color: #ff4d4f;
+        font-size: 14px;
+        text-align: center;
+        
+        .error-detail {
+          font-size: 12px;
+          color: #999;
+          margin-top: 8px;
+        }
+      }
+      
+      svg {
+        max-width: 100%;
+        max-height: 100%;
+        
+        .node {
+          cursor: pointer;
+
+          rect {
+            fill: #fff;
+            stroke: #1890ff;
+            rx: 4;
+            ry: 4;
+          }
+
+          text {
+            font-size: 12px;
+            font-family: 'Arial', sans-serif;
+          }
+
+          span {
+            font-size: 10px;
+            color: #666;
+          }
+
+          &[class*="tooltip"] {
+            &::after {
+              content: attr(title);
+              position: absolute;
+              top: -20px;
+              left: 50%;
+              transform: translateX(-50%);
+              font-size: 10px;
+              color: #999;
+              white-space: nowrap;
+              opacity: 0;
+              transition: opacity 0.2s;
+            }
+
+            &:hover::after {
+              opacity: 1;
+            }
+          }
+
+          position: relative;
+
+          .node-tooltip {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.75);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            pointer-events: none;
+          }
+
+          .node-content {
+            padding: 8px;
+            
+            .node-title {
+              font-size: 14px;
+              font-weight: 500;
+              margin-bottom: 8px;
+              text-align: center;
+            }
+            
+            .node-metrics {
+              display: none;
+              position: absolute;
+              top: 100%;
+              left: 50%;
+              transform: translateX(-50%);
+              background: white;
+              border-radius: 4px;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+              padding: 12px;
+              width: 280px;
+              z-index: 1000;
+
+              .metrics-content {
+                .metrics-group {
+                  margin-bottom: 12px;
+
+                  &:last-child {
+                    margin-bottom: 0;
+                  }
+
+                  .group-title {
+                    font-size: 12px;
+                    color: #666;
+                    margin-bottom: 8px;
+                  }
+
+                  .metrics-row {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 4px;
+
+                    span {
+                      font-size: 12px;
+                      color: #333;
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          &:hover {
+            .node-metrics {
+              display: block;
+            }
+          }
+        }
+
+        .edgePath path {
+          stroke: #1890ff;
+          stroke-width: 1.5px;
+        }
+
+        .edgeLabel {
+          background-color: #fff;
+          padding: 4px;
+          border-radius: 4px;
+          font-size: 12px;
+        }
+
+        #A rect {
+          fill: #e6f7ff;
+        }
+
+        .node {
+          .node-url {
+            font-size: 10px;
+            color: #999;
+            display: none;
+          }
+
+          &:hover {
+            .node-url {
+              display: block;
+            }
+          }
+        }
+      }
+    }
+  }
+} 
+
+.metrics-popover {
+  .ant-popover-inner-content {
+    padding: 12px;
+    width: 280px;
+  }
+
+  .metrics-group {
+    .group-title {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .metrics-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      span {
+        font-size: 12px;
+        color: #333;
+      }
+    }
+
+    &:not(:last-child) {
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+  }
+}
+
+.topology-graph {
+  .node {
+    cursor: pointer;
+  }
+} 
+
+.metrics-tooltip {
+  .ant-tooltip-inner {
+    background: white;
+    padding: 12px;
+    min-width: 280px;
+    color: rgba(0, 0, 0, 0.85);
+  }
+
+  .metrics-content {
+    .metrics-group {
+      &:not(:last-child) {
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .group-title {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+
+      .metrics-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        span {
+          font-size: 12px;
+          color: #333;
+        }
+      }
+    }
+  }
+} 
+
+.topology-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .topology-header {
+    padding: 16px;
+    text-align: right;
+    border-bottom: 1px solid #f0f0f0;
+
+    .ant-switch {
+      min-width: 100px;
+    }
+  }
+
+  .topology-graph {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 24px;
+    
+    // ... 其他现有样式保持不变
+  }
+} 
