@@ -9,8 +9,12 @@ import './styles.less';
 const { Sider, Content } = Layout;
 
 const LinkTopologyPage: React.FC = () => {
-  const [selectedLinkId, setSelectedLinkId] = useState<string>();
+  const [selectedLinkId, setSelectedLinkId] = useState<string | undefined>(undefined);
   const [collapsed, setCollapsed] = useState(false);
+
+  const handleSelect = (key: string) => {
+    setSelectedLinkId(key);
+  };
 
   const toggleSider = () => {
     setCollapsed(!collapsed);
@@ -28,7 +32,7 @@ const LinkTopologyPage: React.FC = () => {
       >
         <BusinessTree 
           data={mockBusinessData}
-          onSelect={setSelectedLinkId} 
+          onSelect={handleSelect} 
         />
         <div className="sider-trigger" onClick={toggleSider}>
           {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
