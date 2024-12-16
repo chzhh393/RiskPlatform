@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Layout } from 'antd';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import { BusinessTree } from './components/BusinessTree';
-import { TopologyGraph } from './components/TopologyGraph';
+import BusinessTree from './components/BusinessTree';
+import TopologyGraph from './components/TopologyGraph';
 import { mockBusinessData } from './services/api';
 import './styles.less';
 
