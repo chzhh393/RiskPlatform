@@ -3,7 +3,7 @@ import { Tree } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import { BusinessScenario, BusinessEntry } from '../types';
 
-interface BusinessTreeProps {
+export interface BusinessTreeProps {
   data: BusinessScenario[];
   onSelect: (key: string) => void;
 }
