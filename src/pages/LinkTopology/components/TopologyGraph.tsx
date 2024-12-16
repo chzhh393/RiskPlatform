@@ -7,6 +7,11 @@ interface TopologyGraphProps {
   linkId?: string;
 }
 
+// 添加类型定义
+interface TopologyData {
+  [key: string]: string;
+}
+
 const TopologyGraph: React.FC<TopologyGraphProps> = ({ linkId }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [showAllMetrics, setShowAllMetrics] = useState(false);
@@ -105,7 +110,8 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ linkId }) => {
     if (!containerRef.current || !linkId) return;
 
     const renderDiagram = async () => {
-      let mermaidCode = mockTopologyData[linkId];
+      const topologyData = mockTopologyData as TopologyData;
+      let mermaidCode = topologyData[linkId];
       if (!mermaidCode) {
         containerRef.current!.innerHTML = '<div class="error-tip">未找到拓扑图数据</div>';
         return;
