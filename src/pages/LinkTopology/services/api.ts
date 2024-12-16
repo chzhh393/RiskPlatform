@@ -1,4 +1,4 @@
-import { BusinessScenario } from '../types';
+import { BusinessScenario, BusinessEntry } from '../types';
 
 export const mockBusinessData: BusinessScenario[] = [
   {

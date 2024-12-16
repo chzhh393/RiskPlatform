@@ -1,46 +1,43 @@
 import React from 'react';
 import { Tree } from 'antd';
 import type { DataNode } from 'antd/es/tree';
-import { mockBusinessData } from '../mock/data';
+import { BusinessScenario, BusinessEntry } from '../types';
 
 interface BusinessTreeProps {
-  onSelect: (linkId: string) => void;
+  data: BusinessScenario[];
+  onSelect: (key: string) => void;
 }
 
-const BusinessTree: React.FC<BusinessTreeProps> = ({ onSelect }) => {
-  // 转换数据格式以适配Tree组件
-  const treeData: DataNode[] = mockBusinessData.map(scenario => ({
+const BusinessTree: React.FC<BusinessTreeProps> = ({ data, onSelect }) => {
+  // 转换数据格式以适配 Tree 组件
+  const treeData: DataNode[] = data.map(scenario => ({
     title: scenario.name,
     key: scenario.key,
-    children: scenario.children.map(entry => ({
+    children: scenario.entries.map((entry: BusinessEntry) => ({
       title: (
-        <div className="tree-node-content">
-          <span>{entry.title}</span>
-          <span className={`level-tag ${entry.level === '核心' ? 'core' : 'non-core'}`}>
+        <span className="tree-node-content">
+          {entry.title}
+          <span className={`level-tag ${entry.level.toLowerCase()}`}>
             {entry.level}
           </span>
-        </div>
+        </span>
       ),
       key: entry.key,
       isLeaf: true,
-    }))
+    })),
   }));
-
-  const handleSelect = (selectedKeys: React.Key[]) => {
-    const key = selectedKeys[0] as string;
-    if (key.startsWith('entry-')) {
-      onSelect(key);
-    }
-  };
 
   return (
     <div className="business-tree-container">
-      <h3 className="tree-title">业务场景</h3>
+      <div className="tree-title">业务场景</div>
       <Tree
-        className="business-tree"
         defaultExpandAll
         treeData={treeData}
-        onSelect={handleSelect}
+        onSelect={(selectedKeys) => {
+          if (selectedKeys.length > 0) {
+            onSelect(selectedKeys[0].toString());
+          }
+        }}
       />
     </div>
   );

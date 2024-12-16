@@ -31,30 +31,20 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ linkId }) => {
   const formatMetrics = (metricsStr: string) => {
     if (!metricsStr) return '';
 
-    // 按行分割指标
     const lines = metricsStr.split('<br/>');
     
-    // 过滤指标
     const filteredLines = lines.filter(line => {
       const trimmedLine = line.trim();
       
-      // 跳过空行
       if (!trimmedLine) return false;
-      
-      // 如果显示全部指标，保留所有行
       if (showAllMetrics) return true;
-      
-      // 如果不是指标行，保留
       if (!trimmedLine.includes(':')) return true;
       
       // 分割指标名和值
-      const [metricName, valueWithBaseline] = trimmedLine.split(':').map(s => s.trim());
+      const [, valueWithBaseline] = trimmedLine.split(':').map(s => s.trim());
       if (!valueWithBaseline) return true;
       
-      // 提取实际值（括号前的部分）
       const actualValue = valueWithBaseline.split('(')[0].trim();
-      
-      // 如果值为"未覆盖"，则过滤掉
       return actualValue !== '未覆盖';
     });
 
@@ -103,7 +93,7 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ linkId }) => {
       .map(line => {
         if (!line.includes('["')) return line;
         
-        return line.replace(/\["([^"]+)"\]/g, (match, content) => {
+        return line.replace(/\["([^"]+)"\]/g, (_, content) => {
           const processedContent = processNodeText(content);
           return `["${processedContent}"]`;
         });
