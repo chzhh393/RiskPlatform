@@ -23,9 +23,3 @@
 
 #### 节点展示结构
 
-1. 默认视图(收起状态)
-```
-import 'antd/dist/antd.css';
-```
-
-</rewritten_file>

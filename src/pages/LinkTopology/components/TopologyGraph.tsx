@@ -126,12 +126,12 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ linkId }) => {
         const processedCode = processMermaidCode(mermaidCode);
         const { svg } = await mermaid.render('topology-graph', processedCode.trim());
         containerRef.current!.innerHTML = svg;
-      } catch (error) {
+      } catch (error: any) {
         console.error('拓扑图渲染失败:', error);
         containerRef.current!.innerHTML = `
           <div class="error-tip">
             拓扑图渲染失败
-            <div class="error-detail">${error.message || '未知错误'}</div>
+            <div class="error-detail">${error?.message || '未知错误'}</div>
           </div>
         `;
       }

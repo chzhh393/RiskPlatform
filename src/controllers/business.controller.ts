@@ -1,17 +1,12 @@
-import { Controller, Get } from '@nestjs/common';
+// 暂时注释掉整个文件，因为这是后端控制器代码
+/*
+import { Controller } from '@nestjs/common';
 import { BusinessService } from '../services/business.service';
 
-@Controller('api/business')
+@Controller('business')
 export class BusinessController {
   constructor(private readonly businessService: BusinessService) {}
 
-  @Get('tree')
-  async getBusinessTree() {
-    return this.businessService.getBusinessTree();
-  }
-
-  @Get('entry/:id')
-  async getBusinessEntry(@Param('id') id: string) {
-    return this.businessService.getBusinessEntry(id);
-  }
-} 
+  // ... 其他方法
+}
+*/ 

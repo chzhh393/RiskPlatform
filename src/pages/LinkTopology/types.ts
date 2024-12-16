@@ -1,37 +1,14 @@
-export interface Business {
+export interface BusinessEntry {
   id: string;
-  name: string;
-  links: Link[];
+  title: string;
+  key: string;
+  level: string;
+  httpEntry: string;
 }
 
-export interface Link {
+export interface BusinessScenario {
   id: string;
   name: string;
-  businessId: string;
-  topology: string;
-}
-
-export interface Node {
-  id: string;
-  name: string;
-  ip: string;
-  port: number;
-  components: Component[];
-}
-
-export interface Component {
-  id: string;
-  name: string;
-  metrics: Metric[];
-}
-
-export interface Metric {
-  name: string;
-  value: number;
-  unit: string;
-  baseline: {
-    min: number;
-    max: number;
-  };
-  status: 'normal' | 'warning' | 'error';
+  key: string;
+  entries: BusinessEntry[];
 } 
