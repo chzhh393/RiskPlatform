@@ -1,12 +1,7 @@
 {
-  "name": "stability-platform",
+  "name": "risk-platform",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
   "dependencies": {
     "@antv/g6": "^4.8.24",
     "antd": "^5.0.0",

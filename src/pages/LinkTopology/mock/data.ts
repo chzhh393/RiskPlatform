@@ -118,3 +118,5 @@ export const getTopologyData = (_flowId: string) => {
     ],
   };
 }; 
+
+console.log('Current mock/data.ts content:');

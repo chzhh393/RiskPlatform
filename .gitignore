@@ -26,3 +26,12 @@ yarn-error.log*
 .vscode/
 *.swp
 *.swo
+
+# backend files
+src/services/business.controller.ts
+src/services/business.service.ts
+
+# 添加到 .gitignore
+*.bak
+backup/
+src/services/
