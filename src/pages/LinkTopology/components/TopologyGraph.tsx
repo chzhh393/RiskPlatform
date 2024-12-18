@@ -102,9 +102,66 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ data }) => {
               fontSize: 12,
             },
           });
+
+          // tps 显示
+          const tpsText = group.addShape('text', {
+            attrs: {
+              text: `tps: ${metrics.tps || '-'}`,
+              x: 20,
+              y: 65,
+              fill: metrics.tpsError ? '#ff4d4f' : '#666',
+              fontSize: 12,
+            },
+          });
+
+          if (cfg.label === '支付中心数据服务') {
+            // sql耗时
+            const sqlText = group.addShape('text', {
+              attrs: {
+                text: `sql耗时: ${metrics.sqlTime}`,
+                x: tpsText.getBBox().maxX + 20,
+                y: 65,
+                fill: metrics.sqlTime > 200 ? '#ff4d4f' : '#666',
+                fontSize: 12,
+              },
+            });
+
+            // 饱和度
+            group.addShape('text', {
+              attrs: {
+                text: `饱和度: ${metrics.saturation || '-'}%`,
+                x: sqlText.getBBox().maxX + 20,
+                y: 65,
+                fill: (metrics.saturation || 0) > 80 ? '#ff4d4f' : '#666',
+                fontSize: 12,
+              },
+            });
+
+            // 最近变更时间
+            group.addShape('text', {
+              attrs: {
+                text: '最近变更时间：11.14 15:06:00',
+                x: 20,
+                y: 85,
+                fill: '#666',
+                fontSize: 12,
+              },
+            });
+          } else {
+            // 其他节点只显示饱和度
+            group.addShape('text', {
+              attrs: {
+                text: `饱和度: ${metrics.saturation || '-'}%`,
+                x: 120,
+                y: 65,
+                fill: (metrics.saturation || 0) > 80 ? '#ff4d4f' : '#666',
+                fontSize: 12,
+              },
+            });
+          }
         } else {
-          // DRDS 只显示成功率
-          group.addShape('text', {
+          // DRDS 显示成功率和 tps 在同一行
+          const successText = group.addShape('text', {
             attrs: {
               text: `成功率: ${metrics.successRate || '-'}%`,
               x: 20,
@@ -113,42 +170,47 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ data }) => {
               fontSize: 12,
             },
           });
-        }
 
-        // 指标行2 - DRDS节点和提交订单节点不显示饱和度
-        group.addShape('text', {
-          attrs: {
-            text: isDRDS || isSubmit ? 
-              `tps: ${metrics.tps || '-'}` :
-              `tps: ${metrics.tps || '-'}    饱和度: ${metrics.saturation || '-'}%`,
-            x: 20,
-            y: 65,
-            fill: metrics.tpsError || (isDRDS && metrics.tps > 200) ? '#ff4d4f' : '#666',
-            fontSize: 12,
-          },
-        });
-
-        // SQL耗时（如果有）
-        if (metrics.sqlTime) {
           group.addShape('text', {
             attrs: {
-              text: `sql耗时: ${metrics.sqlTime}`,
-              x: 20,
-              y: 85,
-              fill: metrics.sqlTime > 200 ? '#ff4d4f' : '#666',
+              text: `tps: ${metrics.tps || '-'}`,
+              x: successText.getBBox().maxX + 20,
+              y: 45,
+              fill: metrics.tpsError ? '#ff4d4f' : '#666',
               fontSize: 12,
             },
           });
-        }
 
-        // 连接池（如果有）
-        if (isDRDS) {
+          // SQL耗时和连接池
+          if (metrics.sqlTime) {
+            group.addShape('text', {
+              attrs: {
+                text: `sql耗时: ${metrics.sqlTime}`,
+                x: 20,
+                y: 65,
+                fill: metrics.sqlTime > 200 ? '#ff4d4f' : '#666',
+                fontSize: 12,
+              },
+            });
+          }
+
           group.addShape('text', {
             attrs: {
               text: `连接池: ${metrics.connectionPool || '-'}%`,
               x: 120,
-              y: 85,
+              y: 65,
               fill: (metrics.connectionPool || 0) > 80 ? '#ff4d4f' : '#666',
+              fontSize: 12,
+            },
+          });
+
+          // 最近变更时间放在最下面
+          group.addShape('text', {
+            attrs: {
+              text: '最近变更时间：11.21 15:06:00',
+              x: 20,
+              y: 85,
+              fill: '#666',
               fontSize: 12,
             },
           });
