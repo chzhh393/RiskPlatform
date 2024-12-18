@@ -15,8 +15,9 @@ export interface BusinessFlow {
 export interface BusinessModule {
   id: string;
   name: string;
+  flowCount: number;
+  errorCount: number;
   total: number;
-  error: number;
 }
 
 export type BusinessFlowMap = Record<string, BusinessFlow[]>; 

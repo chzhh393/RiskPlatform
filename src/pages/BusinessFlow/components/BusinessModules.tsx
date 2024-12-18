@@ -15,7 +15,8 @@ const BusinessModules: React.FC<BusinessModulesProps> = ({ modules }) => {
             <div className="module-name">{module.name}</div>
             <div className="module-count">
               <span className="error-count">{module.errorCount}</span>
-              /0/{module.total}
+              <span> / </span>
+              <span className="total-count">{module.total}</span>
             </div>
           </div>
         </Col>
