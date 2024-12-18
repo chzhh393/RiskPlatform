@@ -10,7 +10,8 @@
     "react-router-dom": "^6.0.0"
   },
    "scripts": {
-    "vercel-build": "npm run build"
+     "build": "vite build",
+    "vercel-build": "vite build"
   }
   ,
   "devDependencies": {
