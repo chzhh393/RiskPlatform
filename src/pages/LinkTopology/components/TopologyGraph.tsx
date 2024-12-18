@@ -1,158 +1,200 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Switch } from 'antd';
-import mermaid from 'mermaid';
-import { mockTopologyData } from '../mock/data';
+import React, { useEffect, useRef } from 'react';
+import G6 from '@antv/g6';
+import './TopologyGraph.less';
+
+interface NodeMetrics {
+  time: number;
+  successRate: number;
+  tps: number;
+  saturation?: number;
+  sqlTime?: number;
+  connectionPool?: number;
+  tpsError?: boolean;
+}
 
 interface TopologyGraphProps {
-  linkId?: string;
+  data: {
+    nodes: {
+      id: string;
+      label: string;
+      metrics: NodeMetrics;
+      style?: any;
+    }[];
+    edges: {
+      source: string;
+      target: string;
+    }[];
+  };
 }
 
-// 添加类型定义
-interface TopologyData {
-  [key: string]: string;
-}
-
-const TopologyGraph: React.FC<TopologyGraphProps> = ({ linkId }) => {
+const TopologyGraph: React.FC<TopologyGraphProps> = ({ data }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [showAllMetrics, setShowAllMetrics] = useState(false);
+  const graphRef = useRef<any>(null);
 
-  // 初始化 mermaid
   useEffect(() => {
-    mermaid.initialize({
-      startOnLoad: false,
-      securityLevel: 'loose',
-      theme: 'default',
-      flowchart: {
-        htmlLabels: true,
-        curve: 'basis',
-        nodeSpacing: 80,
-        rankSpacing: 100,
-        diagramPadding: 20,
+    if (!containerRef.current) return;
+
+    const width = containerRef.current.scrollWidth;
+    const height = containerRef.current.scrollHeight || 600;
+
+    G6.registerNode('service-node', {
+      draw: (cfg: any, group) => {
+        const metrics = cfg.metrics || {};
+        const isDRDS = cfg.label === 'DRDS';
+        const isSubmit = cfg.label === '提交订单';
+        
+        // 判断节点是否有错误指标
+        const hasError = 
+          metrics.sqlTime > 200 || // sql耗时超过200ms
+          (isDRDS && metrics.connectionPool > 80) || // DRDS连接池超过80%
+          metrics.time > 500 || // 响应时间超过500ms
+          metrics.successRate < 99.8; // 成功率低于99.8%
+
+        const rectConfig = {
+          width: 240,
+          height: 100,
+          radius: 4,
+          stroke: hasError ? '#ff4d4f' : '#000000',
+          lineWidth: 1,
+          fill: '#fff',
+        };
+
+        const rect = group.addShape('rect', {
+          attrs: {
+            x: 0,
+            y: 0,
+            ...rectConfig,
+          },
+        });
+
+        // 标题 - 如果有错误指标，标题也显示红色
+        group.addShape('text', {
+          attrs: {
+            text: cfg.label,
+            x: rectConfig.width / 2,
+            y: 20,
+            textAlign: 'center',
+            textBaseline: 'middle',
+            fill: hasError || isDRDS ? '#ff4d4f' : '#333',
+            fontSize: 14,
+            fontWeight: 500,
+          },
+        });
+
+        // 指标行1 - 分开显示耗时和成功率，DRDS不显示净耗时
+        if (!isDRDS) {
+          const timeText = group.addShape('text', {
+            attrs: {
+              text: `${isSubmit ? '耗时' : '净耗时'}: ${metrics.time || '-'}`,
+              x: 20,
+              y: 45,
+              fill: metrics.time > 500 ? '#ff4d4f' : '#666',
+              fontSize: 12,
+            },
+          });
+
+          group.addShape('text', {
+            attrs: {
+              text: `成功率: ${metrics.successRate || '-'}%`,
+              x: timeText.getBBox().maxX + 20,
+              y: 45,
+              fill: metrics.successRate < 99.8 ? '#ff4d4f' : '#666',
+              fontSize: 12,
+            },
+          });
+        } else {
+          // DRDS 只显示成功率
+          group.addShape('text', {
+            attrs: {
+              text: `成功率: ${metrics.successRate || '-'}%`,
+              x: 20,
+              y: 45,
+              fill: metrics.successRate < 99.8 ? '#ff4d4f' : '#666',
+              fontSize: 12,
+            },
+          });
+        }
+
+        // 指标行2 - DRDS节点和提交订单节点不显示饱和度
+        group.addShape('text', {
+          attrs: {
+            text: isDRDS || isSubmit ? 
+              `tps: ${metrics.tps || '-'}` :
+              `tps: ${metrics.tps || '-'}    饱和度: ${metrics.saturation || '-'}%`,
+            x: 20,
+            y: 65,
+            fill: metrics.tpsError || (isDRDS && metrics.tps > 200) ? '#ff4d4f' : '#666',
+            fontSize: 12,
+          },
+        });
+
+        // SQL耗时（如果有）
+        if (metrics.sqlTime) {
+          group.addShape('text', {
+            attrs: {
+              text: `sql耗时: ${metrics.sqlTime}`,
+              x: 20,
+              y: 85,
+              fill: metrics.sqlTime > 200 ? '#ff4d4f' : '#666',
+              fontSize: 12,
+            },
+          });
+        }
+
+        // 连接池（如果有）
+        if (isDRDS) {
+          group.addShape('text', {
+            attrs: {
+              text: `连接池: ${metrics.connectionPool || '-'}%`,
+              x: 120,
+              y: 85,
+              fill: (metrics.connectionPool || 0) > 80 ? '#ff4d4f' : '#666',
+              fontSize: 12,
+            },
+          });
+        }
+
+        return rect;
       },
     });
-  }, []);
 
-  // 过滤指标数据
-  const formatMetrics = useCallback((metricsStr: string) => {
-    if (!metricsStr) return '';
-
-    const lines = metricsStr.split('<br/>');
-    
-    const filteredLines = lines.filter(line => {
-      const trimmedLine = line.trim();
-      
-      if (!trimmedLine) return false;
-      if (showAllMetrics) return true;
-      if (!trimmedLine.includes(':')) return true;
-      
-      // 分割指标名和值
-      const [, valueWithBaseline] = trimmedLine.split(':').map(s => s.trim());
-      if (!valueWithBaseline) return true;
-      
-      const actualValue = valueWithBaseline.split('(')[0].trim();
-      return actualValue !== '未覆盖';
+    const graph = new G6.Graph({
+      container: containerRef.current,
+      width,
+      height,
+      modes: {
+        default: ['drag-canvas', 'zoom-canvas', 'drag-node'],
+      },
+      defaultNode: {
+        type: 'service-node',
+      },
+      defaultEdge: {
+        type: 'line',
+        style: {
+          stroke: '#1890ff',
+          lineWidth: 1,
+          endArrow: true,
+        },
+      },
+      layout: {
+        type: 'dagre',
+        rankdir: 'LR',
+        nodesep: 60,
+        ranksep: 80,
+      },
+      animate: true,
     });
 
-    return filteredLines.join('<br/>');
-  }, [showAllMetrics]);
+    graph.data(data);
+    graph.render();
+    graphRef.current = graph;
 
-  // 处理节点文本
-  const processNodeText = useCallback((text: string) => {
-    // 首先分离节点名称和其他内容
-    const [nodeName, ...rest] = text.split('<br/>');
-    if (rest.length === 0) return text;
-
-    // 分离路径和指标数据
-    const parts = rest.join('<br/>').split(/<\/span>/);
-    if (parts.length < 2) {
-      // 如果只有路径，直接返回原文本
-      return text;
-    }
-
-    // 提取路径和指标部分
-    const pathSpan = parts[0] + '</span>';
-    const metricsSpan = parts[1].match(/<span style='font-size:10px;color:#666'>(.+)$/);
-    
-    if (!metricsSpan) {
-      // 如果没有指标数据，返回节点名称和路径
-      return `${nodeName}<br/>${pathSpan}`;
-    }
-
-    // 处理指标数据
-    const metricsContent = metricsSpan[1];
-    const processedMetrics = formatMetrics(metricsContent);
-
-    // 如果过滤后没有指标，只返回节点名称和路径
-    if (!processedMetrics) {
-      return `${nodeName}<br/>${pathSpan}`;
-    }
-
-    // 重组完整的节点文本
-    return `${nodeName}<br/>${pathSpan}<br/><span style='font-size:10px;color:#666'>${processedMetrics}</span>`;
-  }, [formatMetrics]);
-
-  // 处理 mermaid 代码
-  const processMermaidCode = useCallback((code: string) => {
-    return code
-      .split('\n')
-      .map(line => {
-        if (!line.includes('["')) return line;
-        
-        return line.replace(/\["([^"]+)"\]/g, (_, content) => {
-          const processedContent = processNodeText(content);
-          return `["${processedContent}"]`;
-        });
-      })
-      .join('\n');
-  }, [processNodeText]);
-
-  useEffect(() => {
-    if (!containerRef.current || !linkId) return;
-
-    const renderDiagram = async () => {
-      const topologyData = mockTopologyData as TopologyData;
-      let mermaidCode = topologyData[linkId];
-      if (!mermaidCode) {
-        containerRef.current!.innerHTML = '<div class="error-tip">未找到拓扑图数据</div>';
-        return;
-      }
-
-      try {
-        containerRef.current!.innerHTML = '';
-        const processedCode = processMermaidCode(mermaidCode);
-        const { svg } = await mermaid.render('topology-graph', processedCode.trim());
-        containerRef.current!.innerHTML = svg;
-      } catch (error: unknown) {
-        console.error('拓扑图渲染失败:', error);
-        const errorMessage = error instanceof Error ? error.message : '未知错误';
-        containerRef.current!.innerHTML = `
-          <div class="error-tip">
-            拓扑图渲染失败
-            <div class="error-detail">${errorMessage}</div>
-          </div>
-        `;
-      }
+    return () => {
+      graph.destroy();
     };
+  }, [data]);
 
-    renderDiagram();
-  }, [linkId, processMermaidCode]);
-
-  return (
-    <div className="topology-container">
-      <div className="topology-header">
-        <Switch
-          id="metrics-display-switch"
-          checked={showAllMetrics}
-          onChange={setShowAllMetrics}
-          checkedChildren="隐藏未覆盖指标"
-          unCheckedChildren="显示全部指标"
-        />
-      </div>
-      <div className="topology-graph" ref={containerRef}>
-        {!linkId && <div className="empty-tip">请选择左侧链路查看拓扑图</div>}
-      </div>
-    </div>
-  );
+  return <div ref={containerRef} className="topology-graph" />;
 };
 
 export default TopologyGraph; 
