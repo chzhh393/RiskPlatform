@@ -2,20 +2,22 @@ import React, { useEffect, useRef } from 'react';
 import G6 from '@antv/g6';
 import './TopologyGraph.less';
 
+interface NodeMetrics {
+  time: number;
+  successRate: number;
+  tps: number;
+  saturation?: number;
+  sqlTime?: number;
+  connectionPool?: number;
+  tpsError?: boolean;
+}
+
 interface TopologyGraphProps {
   data: {
     nodes: {
       id: string;
       label: string;
-      metrics: {
-        time: number;
-        successRate: number;
-        tps: number;
-        saturation?: number;
-        sqlTime?: number;
-        connectionPool?: number;
-        tpsError?: boolean;
-      };
+      metrics: NodeMetrics;
       style?: any;
     }[];
     edges: {
