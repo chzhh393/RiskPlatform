@@ -7,7 +7,7 @@ import './styles.less';
 
 const LinkTopologyPage: React.FC = () => {
   const { flowId } = useParams<{ flowId: string }>();
-  const data = getTopologyData(flowId);
+  const data = getTopologyData(flowId || '');
 
   return (
     <div className="link-topology-page">

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import G6 from '@antv/g6';
-import { Card } from 'antd';
 import './TopologyGraph.less';
 
 interface TopologyGraphProps {

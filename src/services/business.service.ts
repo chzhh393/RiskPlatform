@@ -21,6 +21,8 @@ export class BusinessService {
   }
 
   async getBusinessEntry(id: string) {
-    return this.entryRepository.findOne(id);
+    return this.entryRepository.findOne({
+      where: { id: parseInt(id) }
+    });
   }
 } 
