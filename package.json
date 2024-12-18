@@ -10,7 +10,7 @@
     "react-router-dom": "^6.0.0"
   },
    "scripts": {
-    "vercel-build": "tsc && vite build"
+    "vercel-build": "npm run build"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",
