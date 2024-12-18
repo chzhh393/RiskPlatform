@@ -8,19 +8,19 @@ import { BusinessEntry } from '../entities/business-entry.entity';
 export class BusinessService {
   constructor(
     @InjectRepository(BusinessScenario)
-    private scenarioRepo: Repository<BusinessScenario>,
+    private scenarioRepository: Repository<BusinessScenario>,
     @InjectRepository(BusinessEntry)
-    private entryRepo: Repository<BusinessEntry>,
+    private entryRepository: Repository<BusinessEntry>
   ) {}
 
   async getBusinessTree() {
-    const scenarios = await this.scenarioRepo.find({
+    const scenarios = await this.scenarioRepository.find({
       relations: ['entries'],
     });
     return scenarios;
   }
 
   async getBusinessEntry(id: string) {
-    return this.entryRepo.findOne(id);
+    return this.entryRepository.findOne(id);
   }
 } 
