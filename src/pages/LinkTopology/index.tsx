@@ -1,39 +1,20 @@
-import React, { useState } from 'react';
-import { Layout } from 'antd';
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import BusinessTree from './components/BusinessTree';
+import React from 'react';
+import { Card } from 'antd';
 import TopologyGraph from './components/TopologyGraph';
+import { useParams } from 'react-router-dom';
+import { getTopologyData } from './mock/data';
 import './styles.less';
 
-const { Sider, Content } = Layout;
-
 const LinkTopologyPage: React.FC = () => {
-  const [selectedLink, setSelectedLink] = useState<string>();
-  const [collapsed, setCollapsed] = useState(false);
-
-  const toggleSider = () => {
-    setCollapsed(!collapsed);
-  };
+  const { flowId } = useParams<{ flowId: string }>();
+  const data = getTopologyData(flowId);
 
   return (
-    <Layout className="link-topology-page">
-      <Sider 
-        width={300} 
-        theme="light" 
-        className="left-sider"
-        collapsible
-        collapsed={collapsed}
-        trigger={null}
-      >
-        <BusinessTree onSelect={setSelectedLink} />
-        <div className="sider-trigger" onClick={toggleSider}>
-          {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-        </div>
-      </Sider>
-      <Content className="right-content">
-        <TopologyGraph linkId={selectedLink} />
-      </Content>
-    </Layout>
+    <div className="link-topology-page">
+      <Card title="链路拓扑">
+        <TopologyGraph data={data} />
+      </Card>
+    </div>
   );
 };
 

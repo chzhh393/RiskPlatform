@@ -1,0 +1,42 @@
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  
+  .status-bar {
+    height: 32px;
+    background: #fff;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    border-bottom: 1px solid #f0f0f0;
+    flex: 0 0 auto;
+    
+    .status-item {
+      margin-right: 32px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #666;
+      
+      &.error {
+        color: #ff4d4f;
+      }
+      
+      &.warning {
+        color: #faad14;
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+  
+  .app-content {
+    flex: 1;
+    padding: 4px;
+    background: #f0f2f5;
+    overflow: auto;
+  }
+} 
