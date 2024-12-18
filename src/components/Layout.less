@@ -9,26 +9,21 @@
     padding: 0 24px;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
     border-bottom: 1px solid #f0f0f0;
     flex: 0 0 auto;
     
-    .status-item {
-      margin-right: 32px;
-      font-size: 14px;
-      font-weight: 500;
-      color: #666;
-      
-      &.error {
-        color: #ff4d4f;
-      }
-      
-      &.warning {
-        color: #faad14;
-      }
+    .screen-links {
+      display: flex;
+      gap: 24px;
 
-      &:last-child {
-        margin-right: 0;
+      .screen-link {
+        color: #1890ff;
+        cursor: pointer;
+        font-size: 14px;
+        
+        &:hover {
+          color: #40a9ff;
+        }
       }
     }
   }

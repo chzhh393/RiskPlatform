@@ -1,0 +1,63 @@
+.change-screen-page {
+  .time-group {
+    margin-bottom: 24px;
+
+    .time-header {
+      font-size: 24px;
+      color: #1d1d1f;
+      margin-bottom: 16px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 8px 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+  }
+
+  .change-item {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 16px;
+    border-radius: 12px;
+    position: relative;
+    min-height: 100px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .change-title {
+      color: #1d1d1f;
+      font-size: 16px;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .change-time {
+      color: #86868b;
+      font-size: 14px;
+    }
+
+    .change-count {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #0071e3;
+      color: #fff;
+      padding: 2px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    &.has-count {
+      border: 1px solid rgba(0, 113, 227, 0.2);
+    }
+  }
+} 

@@ -1,12 +1,60 @@
-export const mockBusinessModules = [
-  { id: 'pay', name: '去交费', flowCount: 4, errorCount: 4, total: 6 },
-  { id: 'electric', name: '电费电量', flowCount: 0, errorCount: 0, total: 4 },
-  { id: 'account', name: '户号管理', flowCount: 0, errorCount: 0, total: 2 },
-  { id: 'balance', name: '电费余额', flowCount: 0, errorCount: 0, total: 1 },
-  { id: 'user', name: '用户中心', flowCount: 0, errorCount: 0, total: 5 },
-  { id: 'homepage', name: '首页交互', flowCount: 0, errorCount: 0, total: 3 },
-  { id: 'miniapp', name: '小程序', flowCount: 0, errorCount: 0, total: 9 },
-  { id: 'other', name: '其它业务', flowCount: 0, errorCount: 0, total: 8 }
+export const mockBusinessModules: BusinessModule[] = [
+  {
+    id: 'pay',
+    name: '去交费',
+    errorCount: 4,
+    warningCount: 0,
+    total: 6
+  },
+  {
+    id: 'electric',
+    name: '电费电量',
+    errorCount: 0,
+    warningCount: 0,
+    total: 4
+  },
+  {
+    id: 'account',
+    name: '户号管理',
+    errorCount: 0,
+    warningCount: 0,
+    total: 2
+  },
+  {
+    id: 'balance',
+    name: '电费余额',
+    errorCount: 0,
+    warningCount: 0,
+    total: 1
+  },
+  {
+    id: 'user',
+    name: '用户中心',
+    errorCount: 0,
+    warningCount: 0,
+    total: 5
+  },
+  {
+    id: 'homepage',
+    name: '首页交互',
+    errorCount: 0,
+    warningCount: 0,
+    total: 3
+  },
+  {
+    id: 'miniapp',
+    name: '小程序',
+    errorCount: 0,
+    warningCount: 0,
+    total: 9
+  },
+  {
+    id: 'other',
+    name: '其它业务',
+    errorCount: 0,
+    warningCount: 0,
+    total: 8
+  }
 ];
 
 export const mockBusinessFlows = {
