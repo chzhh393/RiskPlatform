@@ -15,13 +15,13 @@ const BusinessFlowList: React.FC = () => {
 
   return (
     <Row gutter={[16, 16]} className="business-flows">
-      {Object.entries(mockBusinessFlows).map(([moduleId, flows]) => (
+      {Object.entries(mockBusinessFlows as Record<string, BusinessFlow[]>).map(([moduleId, flows]) => (
         <Col key={moduleId} span={3}>
           <Row gutter={[0, 16]}>
             {flows.map(flow => (
               <Col key={flow.id} span={24}>
                 <div 
-                  className={`flow-item ${flow.isError ? 'error' : ''} ${flow.name === '提交订单' ? 'clickable' : ''}`}
+                  className={`flow-item ${flow?.isError ?? false ? 'error' : ''} ${flow.name === '提交订单' ? 'clickable' : ''}`}
                   onClick={() => handleFlowClick(flow.id, flow.name)}
                 >
                   <div className="flow-name">{flow.name}</div>
@@ -38,7 +38,7 @@ const BusinessFlowList: React.FC = () => {
                     </div>
                     <div className="metric">
                       <span>TPS</span>
-                      <span className={flow.metrics.tpsError ? 'error' : ''}>
+                      <span className={flow.metrics?.tpsError ?? false ? 'error' : ''}>
                         {flow.metrics.tps}
                       </span>
                     </div>
