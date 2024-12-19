@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card } from 'antd';
 import TopologyGraph from './components/TopologyGraph';
 import './styles.less';
 
@@ -177,11 +176,30 @@ const mockData = {
   ]
 };
 
+export interface TopologyNode {
+  id: string;
+  name: string;
+  metrics: {
+    responseTime: number;
+    successRate: number;
+    tps: number;
+    saturation?: number;
+    baseline: {
+      responseTime: number;
+      successRate: number;
+      tps: number;
+      saturation?: number;
+    };
+  };
+  icons?: string[];
+  iconStatus?: Record<string, string>;
+}
+
 const LinkTopologyPage: React.FC = () => {
   return (
     <div className="link-topology-page">
       <TopologyGraph 
-        nodes={mockData.nodes} 
+        nodes={mockData.nodes as TopologyNode[]} 
         edges={mockData.edges} 
       />
     </div>

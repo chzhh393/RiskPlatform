@@ -1,3 +1,11 @@
+interface BusinessModule {
+  id: string;
+  name: string;
+  errorCount: number;
+  warningCount: number;
+  total: number;
+}
+
 export const mockBusinessModules: BusinessModule[] = [
   {
     id: 'pay',

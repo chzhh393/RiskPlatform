@@ -1,39 +1,29 @@
 import React, { useEffect, useRef } from 'react';
 import './TopologyGraph.less';
+import { TopologyNode } from '../index';
 
-interface NodeMetrics {
-  responseTime: number;
-  successRate: number;
-  tps: number;
-  saturation: number;
-  baseline: {
-    responseTime: number;
-    successRate: number;
-    tps: number;
-    saturation: number;
-  };
-}
-
-interface TopologyNode {
-  id: string;
-  name: string;
-  metrics: NodeMetrics;
-  icons?: string[];
-}
+// Remove or comment out the unused interface
+// interface NodeMetrics {
+//   responseTime: number;
+//   successRate: number;
+//   tps: number;
+//   saturation: number;
+//   baseline: {
+//     responseTime: number;
+//     successRate: number;
+//     tps: number;
+//     saturation: number;
+//   };
+// }
 
 interface TopologyProps {
   nodes: TopologyNode[];
   edges: { source: string; target: string; }[];
 }
 
-// 添加图标路径定义
-const iconPaths = {
-  db: 'M12 3C7.58 3 4 4.79 4 7V17C4 19.21 7.58 21 12 21S20 19.21 20 17V7C20 4.79 16.42 3 12 3M18 17C18 17.5 15.87 19 12 19S6 17.5 6 17V14.77C7.61 15.55 9.72 16 12 16S16.39 15.55 18 14.77V17M18 12.45C16.7 13.4 14.42 14 12 14C9.58 14 7.3 13.4 6 12.45V9.64C7.47 10.47 9.61 11 12 11C14.39 11 16.53 10.47 18 9.64V12.45M12 9C8.13 9 6 7.5 6 7S8.13 5 12 5C15.87 5 18 6.5 18 7S15.87 9 12 9Z',
-  mq: 'M3 6C3 4.9 3.9 4 5 4H19C20.1 4 21 4.9 21 6V18C21 19.1 20.1 20 19 20H5C3.9 20 3 19.1 3 18V6M5 6V18H19V6H5M7 9H17V11H7V9M7 13H17V15H7V13Z',
-  cache: 'M9 3V4H4V6H5V19C5 20.1 5.9 21 7 21H17C18.1 21 19 20.1 19 19V6H20V4H15V3H9M7 6H17V19H7V6M9 8V17H11V8H9M13 8V17H15V8H13Z'
-};
 
-const IconBox: React.FC<{ text: string; active: boolean; color?: string }> = ({ text, active, color }) => {
+
+const IconBox = ({ text, active, color }: { text: string; active: boolean; color?: string }) => {
   const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   
   // 方框背景
@@ -277,10 +267,14 @@ const TopologyGraph: React.FC<TopologyProps> = ({ nodes, edges }) => {
             <tspan fill="#fff">流量: </tspan>
             <tspan fill="${getMetricColor(node.metrics.tps, node.metrics.baseline.tps)}">${node.metrics.tps}/${node.metrics.baseline.tps}tps</tspan>
           </tspan>
-          <tspan x="-${width/2 - 20}" dy="18">
-            <tspan fill="#fff">饱和度: </tspan>
-            <tspan fill="${getMetricColor(node.metrics.saturation, node.metrics.baseline.saturation)}">${node.metrics.saturation}/${node.metrics.baseline.saturation}%</tspan>
-          </tspan>
+          ${node.metrics.saturation !== undefined ? `
+            <tspan x="-${width/2 - 20}" dy="18">
+              <tspan fill="#fff">饱和度: </tspan>
+              <tspan fill="${getMetricColor(node.metrics.saturation, node.metrics.baseline.saturation ?? 0)}">
+                ${node.metrics.saturation}/${node.metrics.baseline.saturation ?? 0}%
+              </tspan>
+            </tspan>
+          ` : ''}
         `;
 
         // 渲染底部图标 - 调整图标位置
