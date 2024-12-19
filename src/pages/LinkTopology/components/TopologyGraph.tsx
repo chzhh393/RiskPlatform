@@ -33,7 +33,7 @@ const iconPaths = {
   cache: 'M9 3V4H4V6H5V19C5 20.1 5.9 21 7 21H17C18.1 21 19 20.1 19 19V6H20V4H15V3H9M7 6H17V19H7V6M9 8V17H11V8H9M13 8V17H15V8H13Z'
 };
 
-const IconBox: React.FC<{ text: string; active: boolean }> = ({ text, active }) => {
+const IconBox: React.FC<{ text: string; active: boolean; color?: string }> = ({ text, active, color }) => {
   const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   
   // 方框背景
@@ -51,12 +51,29 @@ const IconBox: React.FC<{ text: string; active: boolean }> = ({ text, active }) 
   textElement.setAttribute('x', '16');
   textElement.setAttribute('y', '14');
   textElement.setAttribute('text-anchor', 'middle');
-  textElement.setAttribute('fill', active ? 'rgba(255, 255, 255, 0.85)' : 'rgba(255, 255, 255, 0.25)');
+  textElement.setAttribute('fill', active ? color || 'rgba(255, 255, 255, 0.85)' : 'rgba(255, 255, 255, 0.25)');
   textElement.setAttribute('font-size', '12');
   textElement.textContent = text;
   g.appendChild(textElement);
 
   return g;
+};
+
+const getIconColor = (node: any, iconType: string) => {
+  // If node has iconStatus and status is specified for this icon
+  if (node.iconStatus && node.iconStatus[iconType]) {
+    return node.iconStatus[iconType] === 'error' ? '#ff4d4f' : '#52c41a';
+  }
+  // Default to healthy green if no status specified
+  return '#52c41a';
+};
+
+// Add new function for submit node metric color
+const getSubmitMetricColor = (value: number, baseline: number) => {
+  const ratio = value / baseline;
+  if (ratio <= 1.2) return '#ffffff'; // Use white for healthy state
+  if (ratio <= 1.5) return '#faad14'; // Warning stays orange
+  return '#ff4d4f'; // Error stays red
 };
 
 const TopologyGraph: React.FC<TopologyProps> = ({ nodes, edges }) => {
@@ -146,7 +163,7 @@ const TopologyGraph: React.FC<TopologyProps> = ({ nodes, edges }) => {
     });
 
     // 修改渲染图标的部分
-    const renderIcons = (nodeGroup: SVGGElement, icons: string[] = [], y: number) => {
+    const renderIcons = (nodeGroup: SVGGElement, node: any, icons: string[] = [], y: number) => {
       const iconStartX = -52;
       const iconGap = 36;
 
@@ -163,7 +180,8 @@ const TopologyGraph: React.FC<TopologyProps> = ({ nodes, edges }) => {
         
         const iconBox = IconBox({
           text: icon.text,
-          active: icons.includes(icon.id)
+          active: icons.includes(icon.id),
+          color: getIconColor(node, icon.id)
         });
         
         iconGroup.appendChild(iconBox);
@@ -214,29 +232,33 @@ const TopologyGraph: React.FC<TopologyProps> = ({ nodes, edges }) => {
       // 渲染指标 - 调整指标位置和间距
       const getMetricColor = (value: number, baseline: number) => {
         const ratio = value / baseline;
-        if (ratio <= 0.8) return '#52c41a';
-        if (ratio <= 0.9) return '#faad14';
-        return '#ff4d4f';
+        if (ratio <= 1.2) return '#52c41a'; // Healthy - up to 20% above baseline
+        if (ratio <= 1.5) return '#faad14'; // Warning - 20-50% above baseline
+        return '#ff4d4f'; // Bottleneck - more than 50% above baseline
       };
 
       const metrics = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       metrics.setAttribute('x', `-${width/2 - 20}`);
       
       if (isSubmit) {
-        // 入口节点指标 - 增加标题和指标的间距
-        metrics.setAttribute('y', `-${height/2 - 45}`);  // 调整起始位置，远离标题
         metrics.innerHTML = `
           <tspan x="-${width/2 - 20}" dy="0">
             <tspan fill="#fff">耗时: </tspan>
-            <tspan fill="#fff">${node.metrics.responseTime}ms</tspan>
+            <tspan fill="${getSubmitMetricColor(node.metrics.responseTime, node.metrics.baseline.responseTime)}">
+              ${node.metrics.responseTime}/${node.metrics.baseline.responseTime}ms
+            </tspan>
           </tspan>
           <tspan x="-${width/2 - 20}" dy="20">
             <tspan fill="#fff">成功率: </tspan>
-            <tspan fill="#fff">${node.metrics.successRate}%</tspan>
+            <tspan fill="${getSubmitMetricColor(node.metrics.successRate, node.metrics.baseline.successRate)}">
+              ${node.metrics.successRate}/${node.metrics.baseline.successRate}%
+            </tspan>
           </tspan>
           <tspan x="-${width/2 - 20}" dy="20">
             <tspan fill="#fff">流量: </tspan>
-            <tspan fill="#fff">${node.metrics.tps}tps</tspan>
+            <tspan fill="${getSubmitMetricColor(node.metrics.tps, node.metrics.baseline.tps)}">
+              ${node.metrics.tps}/${node.metrics.baseline.tps}tps
+            </tspan>
           </tspan>
         `;
       } else {
@@ -264,7 +286,7 @@ const TopologyGraph: React.FC<TopologyProps> = ({ nodes, edges }) => {
         // 渲染底部图标 - 调整图标位置
         if (node.icons) {
           const iconY = height/2 - 30;
-          renderIcons(nodeGroup, node.icons || [], iconY);
+          renderIcons(nodeGroup, node, node.icons || [], iconY);
         }
       }
       nodeGroup.appendChild(metrics);
