@@ -16,7 +16,9 @@ const ChangeList: React.FC = () => {
                     <div className="change-title">{change.title}</div>
                     <div className="change-time">{change.changeTime}</div>
                     {change.count > 0 && (
-                      <div className="change-count">{change.count}</div>
+                      <div className="change-count" data-count={change.count}>
+                        {change.count}
+                      </div>
                     )}
                   </div>
                 </Col>

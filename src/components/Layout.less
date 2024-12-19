@@ -1,37 +1,49 @@
 .app-layout {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  
-  .status-bar {
-    height: 32px;
-    background: #fff;
-    padding: 0 24px;
+
+  .ant-layout-header {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid #f0f0f0;
-    flex: 0 0 auto;
-    
-    .screen-links {
-      display: flex;
-      gap: 24px;
+    padding: 0 24px;
+    background: #001529;
 
-      .screen-link {
-        color: #1890ff;
-        cursor: pointer;
-        font-size: 14px;
-        
+    .logo {
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      margin-right: 48px;
+    }
+
+    .ant-menu {
+      flex: 1;
+      background: transparent;
+      border-bottom: none;
+
+      .ant-menu-item {
         &:hover {
-          color: #40a9ff;
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        a {
+          color: rgba(255, 255, 255, 0.65);
+          
+          &:hover {
+            color: #fff;
+          }
+        }
+      }
+
+      .ant-menu-item-selected {
+        background-color: #1890ff;
+        
+        a {
+          color: #fff;
         }
       }
     }
   }
-  
-  .app-content {
-    flex: 1;
-    padding: 4px;
-    background: #f0f2f5;
-    overflow: auto;
+
+  .ant-layout-content {
+    padding: 0;
   }
 } 

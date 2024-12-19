@@ -12,6 +12,17 @@ export const getTopologyData = (_flowId: string) => {
         },
       },
       {
+        id: 'scp',
+        label: '服务连接平台',
+        metrics: {
+          time: 26,
+          successRate: 99.89,
+          tps: 28,
+          saturation: 68,
+        },
+        icons: ['mq', 'cache']
+      },
+      {
         id: 'api',
         label: 'api网关',
         metrics: {
@@ -20,6 +31,7 @@ export const getTopologyData = (_flowId: string) => {
           tps: 28,
           saturation: 68,
         },
+        icons: ['db', 'cache']
       },
       {
         id: 'gateway',
@@ -30,6 +42,7 @@ export const getTopologyData = (_flowId: string) => {
           tps: 28,
           saturation: 68,
         },
+        icons: ['db', 'cache']
       },
       {
         id: 'front',
@@ -40,6 +53,7 @@ export const getTopologyData = (_flowId: string) => {
           tps: 28,
           saturation: 68,
         },
+        icons: ['db', 'cache']
       },
       {
         id: 'activity',
@@ -50,6 +64,7 @@ export const getTopologyData = (_flowId: string) => {
           tps: 28,
           saturation: 68,
         },
+        icons: ['db', 'cache']
       },
       {
         id: 'pay',
@@ -61,6 +76,7 @@ export const getTopologyData = (_flowId: string) => {
           saturation: 68,
           sqlTime: 302,
         },
+        icons: ['db', 'cache']
       },
       {
         id: 'drds',
@@ -73,6 +89,7 @@ export const getTopologyData = (_flowId: string) => {
           sqlTime: 442,
           tpsError: true,
         },
+        icons: ['db', 'cache']
       },
       {
         id: 'asset',
@@ -83,6 +100,7 @@ export const getTopologyData = (_flowId: string) => {
           tps: 28,
           saturation: 68,
         },
+        icons: ['db', 'cache']
       },
       {
         id: 'center',
@@ -93,6 +111,7 @@ export const getTopologyData = (_flowId: string) => {
           tps: 28,
           saturation: 68,
         },
+        icons: ['db', 'cache']
       },
       {
         id: 'risk',
@@ -103,7 +122,30 @@ export const getTopologyData = (_flowId: string) => {
           tps: 28,
           saturation: 68,
         },
+        icons: ['db', 'cache']
       },
+      {
+        id: 'payDomain',
+        label: '支付中心中台服务',
+        metrics: {
+          time: 88,
+          successRate: 99.97,
+          tps: 39,
+          saturation: 58,
+        },
+        icons: ['db', 'cache']
+      },
+      {
+        id: 'orderDomain',
+        label: '订单中心中台服务',
+        metrics: {
+          time: 92,
+          successRate: 99.98,
+          tps: 38,
+          saturation: 46,
+        },
+        icons: ['db', 'cache']
+      }
     ],
     edges: [
       { source: 'submit', target: 'api' },

@@ -1,36 +1,40 @@
 import React from 'react';
-import { Layout } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Layout, Menu } from 'antd';
+import { Link, useLocation } from 'react-router-dom';
 import './Layout.less';
 
-const { Content } = Layout;
+const { Header, Content } = Layout;
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
+const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const location = useLocation();
 
-const AppLayout: React.FC<LayoutProps> = ({ children }) => {
-  const navigate = useNavigate();
-
-  const openChangeScreen = () => {
-    window.open('/change-screen', '_blank');
-  };
-
-  const openBusinessFlow = () => {
-    window.open('/business-flow', '_blank');
-  };
+  const menuItems = [
+    {
+      key: 'business-flow',
+      label: <Link to="/business-flow">业务大屏</Link>,
+    },
+    {
+      key: 'link-topology',
+      label: <Link to="/topology/flow-3">链路大屏</Link>,
+    },
+    {
+      key: 'change-board',
+      label: <Link to="/change-screen">变更大屏</Link>,
+    },
+  ];
 
   return (
     <Layout className="app-layout">
-      <div className="status-bar">
-        <div className="screen-links">
-          <div className="screen-link" onClick={openBusinessFlow}>业务大屏</div>
-          <div className="screen-link" onClick={openChangeScreen}>变更大屏</div>
-        </div>
-      </div>
-      <Content className="app-content">
-        {children}
-      </Content>
+      <Header>
+        <div className="logo">指挥平台</div>
+        <Menu
+          theme="dark"
+          mode="horizontal"
+          selectedKeys={[location.pathname.slice(1)]}
+          items={menuItems}
+        />
+      </Header>
+      <Content>{children}</Content>
     </Layout>
   );
 };

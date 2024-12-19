@@ -1,6 +1,93 @@
 .topology-graph {
-  width: 100%;
-  height: calc(100vh - 100px);
-  background: #fff;
-  border-radius: 4px;
+  height: calc(100vh - 32px);
+  background-color: rgba(22, 45, 80, 0.8);
+  padding: 20px;
+  overflow: hidden;
+  position: relative;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  // 状态图例样式
+  .legend {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 12px;
+    border-radius: 4px;
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 8px;
+      }
+
+      .text {
+        color: #fff;
+        font-size: 12px;
+      }
+    }
+  }
+
+  // 节点样式
+  .node {
+    &-submit {
+      .title {
+        font-size: 16px;
+        font-weight: bold;
+        fill: #fff;
+      }
+
+      .metrics {
+        font-size: 12px;
+        fill: #fff;
+      }
+    }
+
+    &-service {
+      .title {
+        font-size: 16px;
+        font-weight: bold;
+        fill: #fff;
+      }
+
+      .metrics {
+        font-size: 12px;
+      }
+
+      .icons {
+        .icon-box {
+          stroke: rgba(255, 255, 255, 0.85);
+          
+          &.inactive {
+            stroke: rgba(255, 255, 255, 0.25);
+          }
+        }
+      }
+    }
+  }
+
+  // 连线样式
+  .edge {
+    stroke: #1890ff;
+    stroke-width: 1.5;
+    fill: none;
+
+    &-arrow {
+      fill: #1890ff;
+    }
+  }
 } 

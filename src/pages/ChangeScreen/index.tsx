@@ -6,7 +6,7 @@ import './styles.less';
 const ChangeScreenPage: React.FC = () => {
   return (
     <div className="change-screen-page">
-      <Card title="变更大屏">
+      <Card>
         <ChangeList />
       </Card>
     </div>
