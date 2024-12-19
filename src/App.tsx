@@ -10,10 +10,11 @@ const App: React.FC = () => {
     <Router>
       <Layout>
         <Routes>
-          <Route path="/business-flow" element={<BusinessFlow />} />
-          <Route path="/link-topology" element={<LinkTopology />} />
-          <Route path="/change-board" element={<ChangeBoard />} />
           <Route path="/" element={<Navigate to="/business-flow" replace />} />
+          <Route path="/business-flow/*" element={<BusinessFlow />} />
+          <Route path="/topology/flow-3/*" element={<LinkTopology />} />
+          <Route path="/change-screen/*" element={<ChangeBoard />} />
+          <Route path="*" element={<Navigate to="/business-flow" replace />} />
         </Routes>
       </Layout>
     </Router>

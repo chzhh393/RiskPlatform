@@ -13,5 +13,10 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true
+  },
+  base: '/',  // 确保基础路径正确
+  build: {
+    outDir: 'dist',
+    sourcemap: true
   }
 });
