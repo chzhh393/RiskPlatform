@@ -15,7 +15,7 @@ const getMetricColor = (value: number, baseline: number) => {
 };
 
 // 添加资源标签的文本映射
-const resourceLabels = {
+const resourceLabels: Record<string, string> = {
   db: 'DB',
   mq: 'MQ',
   cache: '缓存'
@@ -99,7 +99,7 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
     const verticalGap = 120;               // 减小垂直间距
 
     // 为业务入口节点设置特定位置
-    const entryPositions = {
+    const entryPositions: Record<string, { level: number; index: number }> = {
       'pay-complete': { level: 0, index: 0 },
       'pay-notify': { level: 0, index: 1 },
       'debt-query': { level: 0, index: 2 },

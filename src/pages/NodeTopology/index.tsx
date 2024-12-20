@@ -260,7 +260,10 @@ const NodeTopologyPage: React.FC = () => {
   return (
     <div className="node-topology-page">
       <TopologyGraph 
-        nodes={mockData.nodes} 
+        nodes={mockData.nodes.map(node => ({
+          ...node,
+          iconStatus: node.iconStatus || {}
+        }))} 
         edges={mockData.edges} 
       />
     </div>
