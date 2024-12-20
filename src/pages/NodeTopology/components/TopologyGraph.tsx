@@ -1,24 +1,17 @@
 import React, { useEffect, useRef } from 'react';
 import { TopologyNode } from '../index';
-import './styles.less';
+import '../styles.less';
 
 interface TopologyGraphProps {
   nodes: TopologyNode[];
   edges: { source: string; target: string; }[];
 }
 
-const getMetricColor = (value: number, baseline: number) => {
+const getMetricColor = (value: number, baseline: number, isEntry: boolean) => {
   const ratio = value / baseline;
-  if (ratio <= 1.2) return '#52c41a';
+  if (ratio <= 1.2) return isEntry ? '#fff' : '#52c41a';
   if (ratio <= 1.5) return '#faad14';
   return '#ff4d4f';
-};
-
-// 添加资源标签的文本映射
-const resourceLabels: Record<string, string> = {
-  db: 'DB',
-  mq: 'MQ',
-  cache: '缓存'
 };
 
 const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
@@ -93,10 +86,10 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
     });
 
     // 调整布局参数
-    const startX = 150;                    // 增加左边距
-    const startY = containerHeight / 6;    // 减小顶部边距
-    const levelGap = 350;                  // 增加水平间距
-    const verticalGap = 120;               // 减小垂直间距
+    const startX = 150;                    // 左边距
+    const startY = containerHeight / 5;    // 减小顶部空间
+    const levelGap = 350;                  // 水平间距
+    const verticalGap = 140;               // 减小垂直间距
 
     // 为业务入口节点设置特定位置
     const entryPositions: Record<string, { level: number; index: number }> = {
@@ -164,26 +157,26 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
       metrics.innerHTML = `
         <tspan x="-${width/2 - 20}" dy="0">
           <tspan fill="#fff">耗时: </tspan>
-          <tspan fill="${getMetricColor(node.metrics.responseTime, node.metrics.baseline.responseTime)}">
+          <tspan fill="${getMetricColor(node.metrics.responseTime, node.metrics.baseline.responseTime, node.type === 'entry')}">
             ${node.metrics.responseTime}/${node.metrics.baseline.responseTime}ms
           </tspan>
         </tspan>
         <tspan x="-${width/2 - 20}" dy="18">
           <tspan fill="#fff">成功率: </tspan>
-          <tspan fill="${getMetricColor(node.metrics.successRate, node.metrics.baseline.successRate)}">
+          <tspan fill="${getMetricColor(node.metrics.successRate, node.metrics.baseline.successRate, node.type === 'entry')}">
             ${node.metrics.successRate}/${node.metrics.baseline.successRate}%
           </tspan>
         </tspan>
         <tspan x="-${width/2 - 20}" dy="18">
           <tspan fill="#fff">流量: </tspan>
-          <tspan fill="${getMetricColor(node.metrics.tps, node.metrics.baseline.tps)}">
+          <tspan fill="${getMetricColor(node.metrics.tps, node.metrics.baseline.tps, node.type === 'entry')}">
             ${node.metrics.tps}/${node.metrics.baseline.tps}tps
           </tspan>
         </tspan>
         ${node.metrics.saturation !== undefined ? `
           <tspan x="-${width/2 - 20}" dy="18">
             <tspan fill="#fff">饱和度: </tspan>
-            <tspan fill="${getMetricColor(node.metrics.saturation, node.metrics.baseline.saturation || 80)}">
+            <tspan fill="${getMetricColor(node.metrics.saturation, node.metrics.baseline.saturation || 80, node.type === 'entry')}">
               ${node.metrics.saturation}/${node.metrics.baseline.saturation || 80}%
             </tspan>
           </tspan>
@@ -191,49 +184,66 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
       `;
       nodeGroup.appendChild(metrics);
 
-      // 修改图标渲染部分
-      if (node.icons && node.icons.length > 0) {
-        const labelHeight = 20;
-        const labelGap = 8;
-        const iconsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        iconsGroup.setAttribute('transform', `translate(${-width/2 + 20}, ${-height/2 + 110})`);
+      // Icon rendering section
+      const iconStartX = -52;
+      const iconGap = 36;
+      const iconY = height/2 - 15;  // 调整图标位置，更靠近底部
 
-        node.icons.forEach((icon, index) => {
-          const labelGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-          const labelWidth = icon === 'cache' ? 36 : 28; // 缓存两个字需要更宽的宽度
+      const iconTypes = [
+        { id: 'db', text: 'DB' },
+        { id: 'mq', text: 'MQ' },
+        { id: 'cache', text: '缓存' }
+      ];
+
+      // 修改图标渲染逻辑，只在非入口节点显示
+      if (node.type !== 'entry') {  // 只在服务节点显示组件指标
+        iconTypes.forEach((icon, index) => {
+          const iconGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          iconGroup.setAttribute('transform', 
+            `translate(${iconStartX + index * iconGap}, ${iconY})`);
+
+          // Background circle
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('r', '14');
+          circle.setAttribute('fill', '#1d39c4');
+          circle.setAttribute('opacity', '0.1');
+          iconGroup.appendChild(circle);
+
+          // Rectangle border
+          const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          rect.setAttribute('x', '-12');
+          rect.setAttribute('y', '-10');
+          rect.setAttribute('width', '24');
+          rect.setAttribute('height', '20');
+          rect.setAttribute('rx', '2');
+          rect.setAttribute('ry', '2');
+          rect.setAttribute('fill', 'none');
           
-          // 计算每个标签的位置
-          const xOffset = index * (labelWidth + labelGap);
-          labelGroup.setAttribute('transform', `translate(${xOffset}, 0)`);
-          
-          // 标签背景
-          const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-          labelBg.setAttribute('width', `${labelWidth}`);
-          labelBg.setAttribute('height', `${labelHeight}`);
-          labelBg.setAttribute('rx', '2');
-          labelBg.setAttribute('fill', '#1d39c4');
-          labelBg.setAttribute('opacity', '0.1');
-          
-          // 标签文本
-          const labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          labelText.setAttribute('x', `${labelWidth/2}`);
-          labelText.setAttribute('y', '14');
-          labelText.setAttribute('text-anchor', 'middle');
-          labelText.setAttribute('font-size', '12');
-          
-          // 设置标签颜色
-          const status = node.iconStatus?.[icon] || 'healthy';
-          const color = status === 'error' ? '#f5222d' : '#52c41a';
-          labelText.setAttribute('fill', color);
-          
-          labelText.textContent = resourceLabels[icon];
-          
-          labelGroup.appendChild(labelBg);
-          labelGroup.appendChild(labelText);
-          iconsGroup.appendChild(labelGroup);
+          // Icon text
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('text-anchor', 'middle');
+          text.setAttribute('dominant-baseline', 'middle');
+          text.setAttribute('font-size', '12');
+
+          if (node.icons?.includes(icon.id)) {
+            // Component is present
+            const status = node.iconStatus?.[icon.id] || 'healthy';
+            const color = status === 'error' ? '#f5222d' : '#52c41a';
+            text.setAttribute('fill', color);
+            rect.setAttribute('stroke', color);
+          } else {
+            // Component is not present
+            text.setAttribute('fill', '#8c8c8c');
+            rect.setAttribute('stroke', '#8c8c8c');
+            rect.setAttribute('opacity', '0.45');
+            text.setAttribute('opacity', '0.45');
+          }
+
+          text.textContent = icon.text;
+          iconGroup.appendChild(rect);
+          iconGroup.appendChild(text);
+          nodeGroup.appendChild(iconGroup);
         });
-
-        nodeGroup.appendChild(iconsGroup);
       }
 
       svg.appendChild(nodeGroup);
