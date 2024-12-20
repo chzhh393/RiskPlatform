@@ -25,6 +25,8 @@ emss-eaa-payelec-front 支付中心前台服务
 emss-pmc-payelec-subdomain 支付中心中台服务
 emss-pmc-oracle-data 支付中心数据服务
 emss-eaa-asset-front 支付中心活动服务
+emss-eaa-individuation-front 省公司个性化需求服务
+emss-eaa-recharge-front 销账服务
 营销中心相关服务
 emss-mia-eca-front 营销中心前台服务
 emss-mac-oracle-data 营销中心数据服务
@@ -33,6 +35,7 @@ emss-mac-eca-subdomain 营销中心中台服务
 emss-pfa-syncorder-front 订单中心前台服务
 emss-odc-drds-data 订单中心数据服务
 emss-odc-ordercud-subdomain 订单中心中台服务
+emss-odc-ordersync-subdomain 订单中心同步服务
 风控服务
 osg-rm0001 风控服务
 osg-rm0009 风控中心策略分发服务

@@ -6,6 +6,7 @@ import zhCN from 'antd/locale/zh_CN';
 import AppLayout from './components/Layout';
 import BusinessFlowPage from './pages/BusinessFlow';
 import LinkTopologyPage from './pages/LinkTopology';
+import NodeTopologyPage from './pages/NodeTopology';
 import ChangeScreenPage from './pages/ChangeScreen';
 import 'antd/dist/reset.css';
 import './styles/global.less';
@@ -18,6 +19,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Routes>
             <Route path="/business-flow" element={<BusinessFlowPage />} />
             <Route path="/topology/:flowId" element={<LinkTopologyPage />} />
+            <Route path="/node-topology" element={<NodeTopologyPage />} />
             <Route path="/change-screen" element={<ChangeScreenPage />} />
             <Route path="/" element={<Navigate to="/business-flow" replace />} />
           </Routes>

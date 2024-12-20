@@ -14,11 +14,15 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       label: <Link to="/business-flow">业务大屏</Link>,
     },
     {
-      key: 'link-topology',
+      key: 'topology',
       label: <Link to="/topology/flow-3">链路大屏</Link>,
     },
     {
-      key: 'change-board',
+      key: 'node-topology',
+      label: <Link to="/node-topology">节点大屏</Link>,
+    },
+    {
+      key: 'change-screen',
       label: <Link to="/change-screen">变更大屏</Link>,
     },
   ];
