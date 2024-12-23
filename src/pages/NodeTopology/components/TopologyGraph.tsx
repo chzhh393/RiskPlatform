@@ -26,7 +26,7 @@ const colors = {
     light: '#ffffff',      // 白色文本
   },
   background: {
-    entry: '#1890FF',      // 使用标准蓝色作为入口节点背景
+    entry: '#597EF7',      // 修改入口节点背景色为带紫调的蓝色
     service: '#213559'     // 服务节点背景色保持不变
   },
   border: {
