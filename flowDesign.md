@@ -34,9 +34,11 @@
 - 使用浅蓝色背景 (#00BCD4)
 - 宽度: 180px
 - 高度: 100px
-- 只显示三个核心指标
-- 健康指标显示为白色
+- 显示三个核心指标
 - 不显示组件图标
+- 显示核心风险指标和故障数
+- 健康指标显示为白色
+
 
 ### 2.2 应用服务节点
 - 使用深蓝色背景 (#213559)
@@ -55,6 +57,14 @@
   * 异常：红色
   * 未使用：灰色(45%透明度)
 - 圆形背景 + 矩形边框
+- 核心风险指标：
+  * 抖动：
+  * 限流：
+  * 性能：
+  * 有风险时显示黄色
+- 故障数：
+  * 格式：故X（X为故障数）
+  * 有故障时显示红色
 
 ## 3. 通用规范
 
@@ -85,11 +95,22 @@ interface NodeMetrics {
   };
 }
 
+interface ComponentStatus {
+  status: 'healthy' | 'error' | 'unused';
+  risks: {
+    jitter?: boolean;    // 抖动
+    limiting?: boolean;  // 限流
+    performance?: boolean; // 性能
+  };
+  faultCount: number;   // 故障数
+}
+
 interface TopologyNode {
   id: string;
   name: string;
   metrics: NodeMetrics;
   icons?: string[];  // ['db', 'mq', 'cache']
+  iconStatus?: Record<string, ComponentStatus>;
 }
 
 interface TopologyEdge {

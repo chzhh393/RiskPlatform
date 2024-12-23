@@ -19,7 +19,17 @@ export interface TopologyNode {
     };
   };
   icons?: string[];
-  iconStatus?: Record<string, string>;
+  iconStatus?: Record<string, ComponentStatus>;
+}
+
+interface ComponentStatus {
+  status: 'healthy' | 'error' | 'unused';
+  risks?: {
+    jitter?: boolean;
+    limiting?: boolean;
+    performance?: boolean;
+  };
+  faultCount?: number;
 }
 
 const mockData = {
@@ -117,7 +127,15 @@ const mockData = {
       },
       icons: ['db'],
       iconStatus: {
-        db: 'healthy'
+        db: {
+          status: 'error',
+          risks: {
+            jitter: true,
+            limiting: true,
+            performance: true
+          },
+          faultCount: 3
+        }
       }
     },
     {
@@ -138,8 +156,24 @@ const mockData = {
       },
       icons: ['db', 'cache'],
       iconStatus: {
-        db: 'healthy',
-        cache: 'healthy'
+        db: {
+          status: 'error',
+          risks: {
+            jitter: true,
+            limiting: false,
+            performance: true
+          },
+          faultCount: 2
+        },
+        cache: {
+          status: 'healthy',
+          risks: {
+            jitter: false,
+            limiting: true,
+            performance: false
+          },
+          faultCount: 1
+        }
       }
     },
     {
@@ -260,10 +294,7 @@ const NodeTopologyPage: React.FC = () => {
   return (
     <div className="node-topology-page">
       <TopologyGraph 
-        nodes={mockData.nodes.map(node => ({
-          ...node,
-          iconStatus: node.iconStatus || {}
-        }))} 
+        nodes={mockData.nodes} 
         edges={mockData.edges} 
       />
     </div>
