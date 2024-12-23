@@ -19,15 +19,15 @@ export interface TopologyNode {
     };
   };
   icons?: string[];
-  iconStatus?: Record<string, ComponentStatus>;
+  iconStatus?: Partial<Record<string, ComponentStatus>>;
 }
 
 interface ComponentStatus {
   status: 'healthy' | 'error' | 'unused';
   risks?: {
-    jitter?: boolean;
-    limiting?: boolean;
-    performance?: boolean;
+    jitter: boolean;
+    limiting: boolean;
+    performance: boolean;
   };
   faultCount?: number;
 }
@@ -95,8 +95,13 @@ const mockData = {
       },
       iconStatus: {
         db: {
-          status: 'error',
-          faultCount: 3
+          status: 'error' as const,
+          faultCount: 3,
+          risks: {
+            jitter: false,
+            limiting: false,
+            performance: false
+          }
         }
       }
     },
@@ -134,13 +139,13 @@ const mockData = {
       icons: ['db'],
       iconStatus: {
         db: {
-          status: 'error',
+          status: 'error' as const,
+          faultCount: 3,
           risks: {
-            jitter: true,
-            limiting: true,
-            performance: true
-          },
-          faultCount: 3
+            jitter: false,
+            limiting: false,
+            performance: false
+          }
         }
       }
     },
@@ -163,16 +168,16 @@ const mockData = {
       icons: ['db', 'cache'],
       iconStatus: {
         db: {
-          status: 'error',
+          status: 'error' as const,
+          faultCount: 3,
           risks: {
-            jitter: true,
+            jitter: false,
             limiting: false,
-            performance: true
-          },
-          faultCount: 2
+            performance: false
+          }
         },
         cache: {
-          status: 'healthy',
+          status: 'healthy' as const,
           risks: {
             jitter: false,
             limiting: true,
@@ -200,7 +205,11 @@ const mockData = {
       },
       icons: ['mq'],
       iconStatus: {
-        mq: 'healthy'
+        mq: {
+          status: 'healthy' as const,
+          risks: {},
+          faultCount: 0
+        }
       }
     },
     {
@@ -300,7 +309,7 @@ const NodeTopologyPage: React.FC = () => {
   return (
     <div className="node-topology-page">
       <TopologyGraph 
-        nodes={mockData.nodes} 
+        nodes={mockData.nodes as TopologyNode[]} 
         edges={mockData.edges} 
       />
     </div>

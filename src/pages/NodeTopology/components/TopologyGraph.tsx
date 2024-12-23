@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { TopologyNode } from '../index';
 import '../styles.less';
-import * as d3 from 'd3';
 
 interface ComponentStatus {
   status: 'healthy' | 'error' | 'unused';
@@ -71,14 +70,14 @@ const calculateNodeDimensions = (node: TopologyNode): { width: number; height: n
   return { width, height, layout };
 };
 
-const getMetricColor = (value: number, baseline: number, isEntry: boolean) => {
+const getMetricColor = (value: number, baseline: number) => {
   const ratio = value / baseline;
   if (ratio > 1.2) {
-    return colors.error;       // 红色
+    return colors.error;
   } else if (ratio > 1.1) {
-    return colors.warning;     // 黄色
+    return colors.warning;
   } else {
-    return colors.healthy;     // 绿色
+    return colors.healthy;
   }
 };
 
@@ -180,7 +179,7 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
 
     // Draw nodes
     nodes.forEach(node => {
-      const { width, height, layout } = calculateNodeDimensions(node);
+      const { width, height } = calculateNodeDimensions(node);
       
       const level = levels[node.id];
       let indexInLevel = levelNodes[level].indexOf(node.id);
@@ -278,8 +277,8 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
           </tspan>
           <tspan x="${iconStartX}" dy="24">
             <tspan fill="#fff">饱和度:</tspan>
-            <tspan dx="5" fill="${getMetricColor(node.metrics.saturation, node.metrics.baseline.saturation || 80)}">
-              ${node.metrics.saturation}/${node.metrics.baseline.saturation || 80}%
+            <tspan dx="5" fill="${getMetricColor(node.metrics.saturation || 0, node.metrics.baseline.saturation || 80)}">
+              ${node.metrics.saturation || 0}/${node.metrics.baseline.saturation || 80}%
             </tspan>
           </tspan>
         `;
