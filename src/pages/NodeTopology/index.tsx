@@ -92,6 +92,12 @@ const mockData = {
           successRate: 99.9,
           tps: 50,
         }
+      },
+      iconStatus: {
+        db: {
+          status: 'error',
+          faultCount: 3
+        }
       }
     },
     {

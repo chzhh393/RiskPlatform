@@ -19,21 +19,19 @@ interface TopologyGraphProps {
 }
 
 const colors = {
-  healthy: '#52c41a',      // 绿色
-  warning: '#faad14',      // 黄色
-  error: '#ff4d4f',        // 红色
-  normal: '#1890ff',       // 蓝色
+  healthy: '#52c41a',      // 绿色 - 健康指标
+  warning: '#faad14',      // 黄色 - 风险指标
+  error: '#ff4d4f',        // 红色 - 故障数
   text: {
     light: '#ffffff',      // 白色文本
-    dark: '#000000',       // 黑色文本
-    muted: '#8c8c8c'       // 灰色文本
   },
   background: {
-    entry: '#1A4469',      // 更深的蓝色背景，替换原来的 #00BCD4
-    service: '#213559'     // 保持服务节点背景不变
+    entry: '#1890FF',      // 使用标准蓝色作为入口节点背景
+    service: '#213559'     // 服务节点背景色保持不变
   },
   border: {
     normal: 'rgba(24, 144, 255, 0.3)',
+    light: 'rgba(255, 255, 255, 0.3)'
   }
 };
 
@@ -47,9 +45,17 @@ interface NodeLayout {
   spacing: number;
 }
 
+// 修改字体大小常量
+const fontSizes = {
+  title: '18',             // 节点标题，原来是16
+  metrics: '14',           // 核心指标，原来是12
+  icons: '13',            // 组件图标，原来是12
+  status: '13'            // 风险指标和故障数，原来是12
+};
+
 const calculateNodeDimensions = (node: TopologyNode): { width: number; height: number; layout: NodeLayout } => {
   const layout: NodeLayout = {
-    padding: 25,
+    padding: 20,
     titleHeight: 30,
     metricsHeight: node.metrics.saturation !== undefined ? 100 : 80,
     componentIconsHeight: 30,
@@ -57,19 +63,15 @@ const calculateNodeDimensions = (node: TopologyNode): { width: number; height: n
     spacing: 10
   };
 
-  const width = node.type === 'entry' ? 220 : 320;
+  const width = node.type === 'entry' ? 240 : 340;  // 保持宽度不变
   const height = node.type === 'entry' 
-    ? 180                               // 增加入口节点高度，给风险指标留出空间
-    : 240;
+    ? 140                 // 入口节点高度
+    : 200;               // 服务节点高度
 
   return { width, height, layout };
 };
 
 const getMetricColor = (value: number, baseline: number, isEntry: boolean) => {
-  if (isEntry) {
-    return colors.text.light;  // 入口节点统一使用白色
-  }
-  
   const ratio = value / baseline;
   if (ratio > 1.2) {
     return colors.error;       // 红色
@@ -78,6 +80,13 @@ const getMetricColor = (value: number, baseline: number, isEntry: boolean) => {
   } else {
     return colors.healthy;     // 绿色
   }
+};
+
+// 添加组件状态颜色
+const componentColors = {
+  healthy: '#52c41a',      // 健康：绿色
+  error: '#ff4d4f',        // 异常：红色
+  unused: 'rgba(255, 255, 255, 0.45)'  // 未使用：灰色(45%透明度)
 };
 
 const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
@@ -155,7 +164,7 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
     const startX = 200;                    // 保持左边距
     const startY = containerHeight / 10;   // 保持顶部边距
     const levelGap = 380;                  // 保持水平间距
-    const verticalGap = 250;               // 显著增加垂直间距
+    const verticalGap = 220;               // 减小垂直间距，让节点更紧凑
 
     // 为业务入口节点设置特定位置
     const entryPositions: Record<string, { level: number; index: number }> = {
@@ -209,54 +218,77 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
       title.setAttribute('y', `-${height/2 - 25}`);
       title.setAttribute('text-anchor', 'middle');
       title.setAttribute('fill', '#fff');
-      title.setAttribute('font-size', '16');
+      title.setAttribute('font-size', fontSizes.title);  // 增大标题字体
       title.setAttribute('font-weight', 'bold');
       title.textContent = node.name;
       nodeGroup.appendChild(title);
 
       // Node metrics
+      const iconStartX = -width/2 + 50;  // 计算图标起始位置和间距
+      const iconGap = 48;
+      
+      // 调整核心指标位置，与图标左对齐
       const metrics = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      metrics.setAttribute('x', `-${width/2 - 50}`);
-      metrics.setAttribute('y', `-${height/2 - 55}`);  // 调整核心指标位置
-      metrics.innerHTML = `
-        <tspan x="-${width/2 - 50}" dy="0">
-          <tspan fill="#fff">耗时:</tspan>
-          <tspan dx="5" fill="${getMetricColor(node.metrics.responseTime, node.metrics.baseline.responseTime, node.type === 'entry')}">
-            ${node.metrics.responseTime}/${node.metrics.baseline.responseTime}ms
+      metrics.setAttribute('x', `${iconStartX}`);
+      metrics.setAttribute('y', `-${height/2 - 45}`);
+
+      // 根据节点类型渲染不同的指标
+      if (node.type === 'entry') {
+        // 入口节点只显示三个核心指标
+        metrics.innerHTML = `
+          <tspan x="${iconStartX}" dy="0" font-size="${fontSizes.metrics}">
+            <tspan fill="#fff">耗时:</tspan>
+            <tspan dx="5" fill="${getMetricColor(node.metrics.responseTime, node.metrics.baseline.responseTime)}">
+              ${node.metrics.responseTime}/${node.metrics.baseline.responseTime}ms
+            </tspan>
           </tspan>
-        </tspan>
-        <tspan x="-${width/2 - 50}" dy="22">
-          <tspan fill="#fff">成功率:</tspan>
-          <tspan dx="5" fill="${getMetricColor(node.metrics.successRate, node.metrics.baseline.successRate, node.type === 'entry')}">
-            ${node.metrics.successRate}/${node.metrics.baseline.successRate}%
+          <tspan x="${iconStartX}" dy="24">  
+            <tspan fill="#fff">成功率:</tspan>
+            <tspan dx="5" fill="${getMetricColor(node.metrics.successRate, node.metrics.baseline.successRate)}">
+              ${node.metrics.successRate}/${node.metrics.baseline.successRate}%
+            </tspan>
           </tspan>
-        </tspan>
-        <tspan x="-${width/2 - 50}" dy="22">
-          <tspan fill="#fff">流量:</tspan>
-          <tspan dx="5" fill="${getMetricColor(node.metrics.tps, node.metrics.baseline.tps, node.type === 'entry')}">
-            ${node.metrics.tps}/${node.metrics.baseline.tps}tps
+          <tspan x="${iconStartX}" dy="24">  
+            <tspan fill="#fff">流量:</tspan>
+            <tspan dx="5" fill="${getMetricColor(node.metrics.tps, node.metrics.baseline.tps)}">
+              ${node.metrics.tps}/${node.metrics.baseline.tps}tps
+            </tspan>
           </tspan>
-        </tspan>
-        ${node.metrics.saturation !== undefined ? `
-          <tspan x="-${width/2 - 50}" dy="22">
+        `;
+      } else {
+        // 服务节点显示四个核心指标（包括饱和度）
+        metrics.innerHTML = `
+          <tspan x="${iconStartX}" dy="0" font-size="${fontSizes.metrics}">
+            <tspan fill="#fff">净耗时:</tspan>
+            <tspan dx="5" fill="${getMetricColor(node.metrics.responseTime, node.metrics.baseline.responseTime)}">
+              ${node.metrics.responseTime}/${node.metrics.baseline.responseTime}ms
+            </tspan>
+          </tspan>
+          <tspan x="${iconStartX}" dy="24">  
+            <tspan fill="#fff">成功率:</tspan>
+            <tspan dx="5" fill="${getMetricColor(node.metrics.successRate, node.metrics.baseline.successRate)}">
+              ${node.metrics.successRate}/${node.metrics.baseline.successRate}%
+            </tspan>
+          </tspan>
+          <tspan x="${iconStartX}" dy="24">  
+            <tspan fill="#fff">流量:</tspan>
+            <tspan dx="5" fill="${getMetricColor(node.metrics.tps, node.metrics.baseline.tps)}">
+              ${node.metrics.tps}/${node.metrics.baseline.tps}tps
+            </tspan>
+          </tspan>
+          <tspan x="${iconStartX}" dy="24">
             <tspan fill="#fff">饱和度:</tspan>
-            <tspan dx="5" fill="${getMetricColor(node.metrics.saturation, node.metrics.baseline.saturation || 80, node.type === 'entry')}">
+            <tspan dx="5" fill="${getMetricColor(node.metrics.saturation, node.metrics.baseline.saturation || 80)}">
               ${node.metrics.saturation}/${node.metrics.baseline.saturation || 80}%
             </tspan>
           </tspan>
-        ` : ''}
-      `;
+        `;
+      }
       nodeGroup.appendChild(metrics);
 
-      // 定义所有图标相关的通用变量
-      const iconStartX = -width/2 + 45;
-      const iconGap = node.type === 'entry' ? 45 : 42;  // 入口节点的图标间距稍大一些
-      
       // 组件图标渲染（只为服务节点）
       if (node.type !== 'entry') {
-        const iconY = 30;  // 调整组件图标位置
-
-        // 组件图标 (DB, MQ, 缓存)
+        const iconY = 35;
         const iconTypes = [
           { id: 'db', text: 'DB' },
           { id: 'mq', text: 'MQ' },
@@ -267,6 +299,10 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
           const iconGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
           iconGroup.setAttribute('transform', `translate(${iconStartX + index * iconGap}, ${iconY})`);
           
+          // 获取组件状态
+          const status = node.iconStatus?.[icon.id]?.status || 'unused';
+          const iconColor = componentColors[status];
+          
           // 组件图标背景
           const iconRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
           iconRect.setAttribute('x', '-20');
@@ -275,15 +311,14 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
           iconRect.setAttribute('height', '20');
           iconRect.setAttribute('rx', '2');
           iconRect.setAttribute('fill', 'none');
-          iconRect.setAttribute('stroke', colors.border.normal);
-          iconRect.setAttribute('fill', 'rgba(24, 144, 255, 0.1)');
+          iconRect.setAttribute('stroke', iconColor);  // 使用状态对应的颜色
 
           // 组件图标文本
           const iconText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
           iconText.setAttribute('text-anchor', 'middle');
           iconText.setAttribute('dominant-baseline', 'middle');
-          iconText.setAttribute('font-size', '12');
-          iconText.setAttribute('fill', colors.text.light);
+          iconText.setAttribute('font-size', fontSizes.icons);
+          iconText.setAttribute('fill', iconColor);  // 使用状态对应的颜色
           iconText.textContent = icon.text;
 
           iconGroup.appendChild(iconRect);
@@ -292,11 +327,9 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
         });
       }
 
-      // 风险指标和故障数渲染（对所有节点）
-      const riskY = node.type === 'entry' 
-        ? 40                     // 入口节点：将风险指标下移到核心指标下方
-        : 70;                    // 服务节点：保持不变
-
+      // 风险指标和故障数渲染
+      const riskY = node.type === 'entry' ? 40 : 75;
+      
       // 风险指标渲染
       const riskTypes = [
         { id: 'jitter', text: '抖动' },
@@ -322,7 +355,7 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'middle');
-        text.setAttribute('font-size', '12');
+        text.setAttribute('font-size', fontSizes.status);
 
         // 使用新的风险判断逻辑
         const hasRisk = (riskType: string) => {
@@ -333,14 +366,27 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
           });
         };
 
-        if (hasRisk(risk.id)) {
-          text.setAttribute('fill', colors.warning);
-          rect.setAttribute('stroke', colors.warning);
-          rect.setAttribute('fill', 'rgba(250, 173, 20, 0.1)');
+        if (node.type === 'entry') {
+          if (hasRisk(risk.id)) {
+            text.setAttribute('fill', colors.warning);      // 风险用黄色
+            rect.setAttribute('stroke', colors.warning);
+            rect.setAttribute('fill', 'rgba(250, 173, 20, 0.1)');
+          } else {
+            text.setAttribute('fill', colors.healthy);      // 健康用绿色
+            rect.setAttribute('stroke', colors.healthy);
+            rect.setAttribute('fill', 'rgba(82, 196, 26, 0.1)');
+          }
         } else {
-          text.setAttribute('fill', colors.text.light);
-          rect.setAttribute('stroke', colors.border.normal);
-          rect.setAttribute('fill', 'rgba(24, 144, 255, 0.1)');
+          // 服务节点的样式保持不变
+          if (hasRisk(risk.id)) {
+            text.setAttribute('fill', colors.warning);
+            rect.setAttribute('stroke', colors.warning);
+            rect.setAttribute('fill', 'rgba(250, 173, 20, 0.1)');
+          } else {
+            text.setAttribute('fill', colors.healthy);
+            rect.setAttribute('stroke', colors.healthy);
+            rect.setAttribute('fill', 'rgba(82, 196, 26, 0.1)');
+          }
         }
 
         text.textContent = risk.text;
@@ -353,7 +399,7 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
       const totalFaults = Object.values(node.iconStatus || {}).reduce((sum, status) => 
         sum + ((status as ComponentStatus).faultCount || 0), 0);
 
-      if (totalFaults > 0) {
+      if (totalFaults > 0 || (node.type === 'entry' && node.id === 'submit-order')) {
         const faultGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         faultGroup.setAttribute('transform', `translate(${iconStartX + 3 * iconGap}, ${riskY})`);
 
@@ -369,7 +415,7 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'middle');
-        text.setAttribute('font-size', '12');
+        text.setAttribute('font-size', fontSizes.status);
         text.setAttribute('fill', colors.error);
         text.textContent = `故${totalFaults}`;
 
