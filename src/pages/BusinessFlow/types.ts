@@ -2,7 +2,11 @@ export interface BusinessMetrics {
   time: number;
   successRate: number;
   tps: number;
-  tpsError?: boolean;
+  baseline: {
+    time: number;
+    successRate: number;
+    tps: number;
+  };
 }
 
 export interface BusinessFlow {
