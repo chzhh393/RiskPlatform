@@ -88,6 +88,42 @@ const componentColors = {
   unused: 'rgba(255, 255, 255, 0.45)'  // 未使用：灰色(45%透明度)
 };
 
+// 添加图例渲染
+const renderLegend = (svg: SVGSVGElement, containerWidth: number) => {
+  const legendGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  legendGroup.setAttribute('transform', `translate(${containerWidth - 120}, 20)`);
+
+  const legendItems = [
+    { text: '健康', color: colors.healthy },
+    { text: '亚健康', color: colors.warning },
+    { text: '瓶颈', color: colors.error },
+    { text: '未使用', color: componentColors.unused }
+  ];
+
+  legendItems.forEach((item, index) => {
+    // 圆点
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', '0');
+    circle.setAttribute('cy', `${index * 24}`);
+    circle.setAttribute('r', '4');
+    circle.setAttribute('fill', item.color);
+
+    // 文本
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', '12');
+    text.setAttribute('y', `${index * 24}`);
+    text.setAttribute('dy', '4');
+    text.setAttribute('fill', '#fff');
+    text.setAttribute('font-size', '12');
+    text.textContent = item.text;
+
+    legendGroup.appendChild(circle);
+    legendGroup.appendChild(text);
+  });
+
+  svg.appendChild(legendGroup);
+};
+
 const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -499,6 +535,9 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
         .call(zoom.transform, d3.zoomIdentity);
     });
     */
+
+    // 添加图例
+    renderLegend(svg, containerWidth);
   }, [nodes, edges]);
 
   return (
