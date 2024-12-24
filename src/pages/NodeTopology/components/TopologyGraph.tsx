@@ -46,10 +46,11 @@ interface NodeLayout {
 
 // 修改字体大小常量
 const fontSizes = {
-  title: '18',             // 节点标题，原来是16
-  metrics: '14',           // 核心指标，原来是12
-  icons: '13',            // 组件图标，原来是12
-  status: '13'            // 风险指标和故障数，原来是12
+  title: '20',             // 节点标题，从18增加到20
+  metrics: '16',           // 核心指标，从14增加到16
+  icons: '14',            // 组件图标，从13增加到14
+  status: '14',           // 风险指标和故障数，从13增加到14
+  legend: '14'            // 图例文字，从12增加到14
 };
 
 const calculateNodeDimensions = (node: TopologyNode): { width: number; height: number; layout: NodeLayout } => {
@@ -114,7 +115,7 @@ const renderLegend = (svg: SVGSVGElement, containerWidth: number) => {
     text.setAttribute('y', `${index * 24}`);
     text.setAttribute('dy', '4');
     text.setAttribute('fill', '#fff');
-    text.setAttribute('font-size', '12');
+    text.setAttribute('font-size', fontSizes.legend);  // 使用更大的字体
     text.textContent = item.text;
 
     legendGroup.appendChild(circle);
@@ -277,13 +278,13 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
               ${node.metrics.responseTime}/${node.metrics.baseline.responseTime}ms
             </tspan>
           </tspan>
-          <tspan x="${iconStartX}" dy="24">  
+          <tspan x="${iconStartX}" dy="24" font-size="${fontSizes.metrics}">  
             <tspan fill="#fff">成功率:</tspan>
             <tspan dx="5" fill="${getMetricColor(node.metrics.successRate, node.metrics.baseline.successRate)}">
               ${node.metrics.successRate}/${node.metrics.baseline.successRate}%
             </tspan>
           </tspan>
-          <tspan x="${iconStartX}" dy="24">  
+          <tspan x="${iconStartX}" dy="24" font-size="${fontSizes.metrics}">  
             <tspan fill="#fff">流量:</tspan>
             <tspan dx="5" fill="${getMetricColor(node.metrics.tps, node.metrics.baseline.tps)}">
               ${node.metrics.tps}/${node.metrics.baseline.tps}tps
@@ -299,19 +300,19 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
               ${node.metrics.responseTime}/${node.metrics.baseline.responseTime}ms
             </tspan>
           </tspan>
-          <tspan x="${iconStartX}" dy="24">  
+          <tspan x="${iconStartX}" dy="24" font-size="${fontSizes.metrics}">  
             <tspan fill="#fff">成功率:</tspan>
             <tspan dx="5" fill="${getMetricColor(node.metrics.successRate, node.metrics.baseline.successRate)}">
               ${node.metrics.successRate}/${node.metrics.baseline.successRate}%
             </tspan>
           </tspan>
-          <tspan x="${iconStartX}" dy="24">  
+          <tspan x="${iconStartX}" dy="24" font-size="${fontSizes.metrics}">  
             <tspan fill="#fff">流量:</tspan>
             <tspan dx="5" fill="${getMetricColor(node.metrics.tps, node.metrics.baseline.tps)}">
               ${node.metrics.tps}/${node.metrics.baseline.tps}tps
             </tspan>
           </tspan>
-          <tspan x="${iconStartX}" dy="24">
+          <tspan x="${iconStartX}" dy="24" font-size="${fontSizes.metrics}">
             <tspan fill="#fff">饱和度:</tspan>
             <tspan dx="5" fill="${getMetricColor(node.metrics.saturation || 0, node.metrics.baseline.saturation || 80)}">
               ${node.metrics.saturation || 0}/${node.metrics.baseline.saturation || 80}%
@@ -323,7 +324,7 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
 
       // 组件图标渲染（只为服务节点）
       if (node.type !== 'entry') {
-        const iconY = 35;
+        const iconY = 45;
         const iconTypes = [
           { id: 'db', text: 'DB' },
           { id: 'mq', text: 'MQ' },
@@ -363,7 +364,7 @@ const TopologyGraph: React.FC<TopologyGraphProps> = ({ nodes, edges }) => {
       }
 
       // 风险指标和故障数渲染
-      const riskY = node.type === 'entry' ? 40 : 75;
+      const riskY = node.type === 'entry' ? 40 : 80;
       
       // 风险指标渲染
       const riskTypes = [
